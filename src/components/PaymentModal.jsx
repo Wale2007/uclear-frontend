@@ -10,12 +10,16 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
   const [cardCvv, setCardCvv] = useState('');
   const [ussdSelected, setUssdSelected] = useState('GTBank (*737#)');
 
-  const flwPublicKey = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || settings?.publicKey || '';
-  const useLiveGateway = !!flwPublicKey;
+  const flwPublicKey = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || settings?.publicKey || 'FLWPUBK_TEST-d024d9409d82dc750045a43347fe46c2-X';
+  const useLiveGateway = true;
 
   useEffect(() => {
-    if (isOpen && useLiveGateway && due) {
-      const timer = setTimeout(() => triggerFlutterwaveSDK(), 400);
+    if (isOpen && due) {
+      const timer = setTimeout(() => {
+        if (window.FlutterwaveCheckout) {
+          triggerFlutterwaveSDK();
+        }
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
