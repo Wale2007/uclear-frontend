@@ -5,12 +5,29 @@ import { X, Printer, ShieldCheck, BadgeCheck, Download, Loader2 } from 'lucide-r
  * Generates the complete self-contained HTML string for the receipt.
  * Used for both the dedicated print window and the PDF export.
  */
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function buildReceiptHtml(receipt, txHash, formattedAmount, receiptUrl) {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(receiptUrl)}`;
   const dateStr = new Date(receipt.date).toLocaleString('en-NG', {
     day: 'numeric', month: 'long', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
+
+  const safePayerName = escapeHtml(receipt.payerName || 'N/A');
+  const safePayerId   = escapeHtml(receipt.payerId || 'N/A');
+  const safeEmail     = escapeHtml(receipt.email || 'N/A');
+  const safeDuesName  = escapeHtml(receipt.duesName || 'Institutional Dues');
+  const safeCategory  = escapeHtml(receipt.category || 'General');
+  const safeTxRef     = escapeHtml(receipt.tx_ref || '');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -122,7 +139,7 @@ function buildReceiptHtml(receipt, txHash, formattedAmount, receiptUrl) {
     </div>
     <div class="header-right">
       <span class="badge-success">✔ Verification Success</span>
-      <div class="tx-ref">${receipt.tx_ref}</div>
+      <div class="tx-ref">${safeTxRef}</div>
     </div>
   </div>
 
@@ -130,15 +147,15 @@ function buildReceiptHtml(receipt, txHash, formattedAmount, receiptUrl) {
   <div class="details-grid">
     <div>
       <div class="detail-label">Payer Name</div>
-      <div class="detail-value">${receipt.payerName || 'N/A'}</div>
+      <div class="detail-value">${safePayerName}</div>
     </div>
     <div>
       <div class="detail-label">Matric / Staff ID</div>
-      <div class="detail-value mono">${receipt.payerId || 'N/A'}</div>
+      <div class="detail-value mono">${safePayerId}</div>
     </div>
     <div>
       <div class="detail-label">Email Address</div>
-      <div class="detail-value">${receipt.email || 'N/A'}</div>
+      <div class="detail-value">${safeEmail}</div>
     </div>
     <div>
       <div class="detail-label">Ledger Entry Date</div>
@@ -159,10 +176,10 @@ function buildReceiptHtml(receipt, txHash, formattedAmount, receiptUrl) {
       <tbody>
         <tr>
           <td>
-            <div class="item-title">${receipt.duesName}</div>
+            <div class="item-title">${safeDuesName}</div>
             <div class="item-sub">Session 2025/2026 Clearance</div>
           </td>
-          <td>${receipt.category || 'General'}</td>
+          <td>${safeCategory}</td>
           <td>₦${formattedAmount}</td>
         </tr>
         <tr class="surcharge">
