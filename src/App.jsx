@@ -310,6 +310,27 @@ export default function App() {
               payerName: profile.name,
               payerId: profile.matricNo || profile.staffId,
             }));
+
+            // Merge with local storage cached receipts so payments persist across sessions
+            try {
+              const localStr = localStorage.getItem('ucleare_receipts');
+              if (localStr) {
+                const local = JSON.parse(localStr);
+                const payerIdVal = profile.matricNo || profile.staffId;
+                local.forEach(lr => {
+                  if (
+                    (lr.payerId === payerIdVal || lr.email === profile.email) &&
+                    !receiptsData.some(r => r.tx_ref === lr.tx_ref)
+                  ) {
+                    receiptsData.unshift(lr);
+                  }
+                });
+              }
+              localStorage.setItem('ucleare_receipts', JSON.stringify(receiptsData));
+            } catch (e) {
+              console.warn('Failed to sync local receipts:', e);
+            }
+
             setReceipts(receiptsData);
           }
         } catch (rErr) {
@@ -424,20 +445,28 @@ export default function App() {
         payerId:   found.matricNo || found.staffId,
       }));
 
+      let allUserReceipts = [...mappedSeed];
+
       try {
         const localStr = localStorage.getItem('ucleare_receipts');
-        let local = localStr ? JSON.parse(localStr) : [];
-        mappedSeed.forEach(r => {
-          if (!local.some(lr => lr.tx_ref === r.tx_ref)) {
-            local.push(r);
-          }
-        });
-        localStorage.setItem('ucleare_receipts', JSON.stringify(local));
+        if (localStr) {
+          const local = JSON.parse(localStr);
+          const payerIdVal = found.matricNo || found.staffId;
+          local.forEach(lr => {
+            if (
+              (lr.payerId === payerIdVal || lr.email === found.email || lr.payerName === found.name) &&
+              !allUserReceipts.some(r => r.tx_ref === lr.tx_ref)
+            ) {
+              allUserReceipts.unshift(lr);
+            }
+          });
+        }
+        localStorage.setItem('ucleare_receipts', JSON.stringify(allUserReceipts));
       } catch (e) {
         console.warn('Failed to cache mock receipts:', e);
       }
 
-      setReceipts(mappedSeed);
+      setReceipts(allUserReceipts);
       setDuesCatalog(MOCK_DUES[found.role] || []);
       setUser(found);
       setIsAuthenticated(true);

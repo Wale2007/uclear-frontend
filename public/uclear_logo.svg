@@ -1,0 +1,8 @@
+<svg width="400" height="100" viewBox="0 0 400 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield Emblem Mark -->
+  <path d="M50 10L84 23.75V50C84 70.3125 69.125 85.9375 50 90.625C30.875 85.9375 16 70.3125 16 50V23.75L50 10Z" fill="#0A2540"/>
+  <path d="M35.9375 48.4375L45.3125 57.8125L67.1875 35.9375" stroke="#FF9B00" stroke-width="9.375" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Typography: Uclear -->
+  <text x="105" y="65" font-family="Inter, system-ui, -apple-system, sans-serif" font-weight="800" font-size="52" fill="#0A2540">U<tspan fill="#FF9B00">clear</tspan></text>
+</svg>
