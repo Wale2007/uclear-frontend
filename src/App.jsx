@@ -400,11 +400,10 @@ export default function App() {
     setTimeout(() => {
       const found = authenticateMockUser(credential, loginPassword, userRole);
       if (!found) {
-        setLoginError(
-          userRole === 'student'
-            ? 'Invalid Matriculation Number or password.'
-            : 'Invalid Staff ID or password.'
-        );
+        let errMsg = 'Invalid Matriculation Number or password.';
+        if (userRole === 'staff') errMsg = 'Invalid Staff ID or password.';
+        if (userRole === 'admin') errMsg = 'Invalid Admin Email/ID or password.';
+        setLoginError(errMsg);
         setIsLoggingIn(false);
         return;
       }

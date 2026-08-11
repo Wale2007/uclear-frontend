@@ -371,16 +371,65 @@ export const MOCK_DUES = {
   ],
 };
 
+export const MOCK_ADMINS = [
+  {
+    id: 'adm-uuid-0001',
+    role: 'admin',
+    name: 'SUG Executive Admin',
+    email: 'sug.admin@futa.edu.ng',
+    phone: '08011112222',
+    staffId: 'FUTA/ADM/SUG/01',
+    department: 'Student Union',
+    faculty: 'Computing',
+    password: 'password123',
+  },
+  {
+    id: 'adm-uuid-0002',
+    role: 'admin',
+    name: 'Faculty of Computing Admin',
+    email: 'computing.admin@futa.edu.ng',
+    phone: '08022223333',
+    staffId: 'FUTA/ADM/FAC/01',
+    department: 'Deanery',
+    faculty: 'Computing',
+    password: 'password123',
+  },
+  {
+    id: 'adm-uuid-0003',
+    role: 'admin',
+    name: 'Software Eng. Dept Admin',
+    email: 'sen.admin@futa.edu.ng',
+    phone: '08033334444',
+    staffId: 'FUTA/ADM/DEP/01',
+    department: 'Software Engineering',
+    faculty: 'Computing',
+    password: 'password123',
+  },
+  {
+    id: 'adm-uuid-0004',
+    role: 'admin',
+    name: 'University Bursar Admin',
+    email: 'bursar.admin@futa.edu.ng',
+    phone: '08044445555',
+    staffId: 'FUTA/ADM/BUR/01',
+    department: 'Bursary',
+    faculty: 'Administration',
+    password: 'password123',
+  },
+];
+
 /**
  * Authenticate a user from the mock database.
- * In production, this is replaced with a Supabase Auth call.
  */
 export function authenticateMockUser(idInput, passwordInput, role) {
-  const db = role === 'student' ? MOCK_STUDENTS : MOCK_STAFF;
+  let dbList = MOCK_STUDENTS;
+  if (role === 'staff') dbList = MOCK_STAFF;
+  if (role === 'admin') dbList = MOCK_ADMINS;
+
   const idField = role === 'student' ? 'matricNo' : 'staffId';
 
   // Match by matric/staff ID or email
-  const user = db.find(
+  const user = dbList.find(
     (u) =>
       (u[idField]?.toLowerCase() === idInput?.toLowerCase() ||
         u.email?.toLowerCase() === idInput?.toLowerCase()) &&
@@ -389,3 +438,4 @@ export function authenticateMockUser(idInput, passwordInput, role) {
 
   return user || null;
 }
+
