@@ -27,7 +27,7 @@ import { MOCK_DUES, MOCK_STUDENTS, MOCK_STAFF, authenticateMockUser } from './da
 import { db } from './firebaseClient';
 import { collection, query, where, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://uclear-backend.onrender.com/api';
 
 // ── Pre-seeded demo receipts (stamped with real user info on login) ──
 const SEED_RECEIPTS = {
@@ -237,17 +237,22 @@ export default function App() {
     setIsLoggingIn(true);
     const credential = loginId.trim();
 
-    // 1. Try Spring Boot REST API Backend
+    // 1. Try Spring Boot REST API Backend with fast 3.5s timeout
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           credential,
           password: loginPassword,
           role: userRole
         })
       });
+      clearTimeout(timeoutId);
 
       if (res.ok) {
         const data = await res.json();
