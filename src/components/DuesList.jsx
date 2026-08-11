@@ -161,8 +161,12 @@ export default function DuesList({ dues, receipts, onInitiatePayment, onViewRece
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filtered.map(due => {
-            const receipt = receipts.find(r => r.duesName === due.name);
-            const isPaid  = !!receipt;
+            const receipt = receipts.find(r => 
+              (r.duesName && due.name && r.duesName.trim().toLowerCase() === due.name.trim().toLowerCase()) ||
+              r.duesId === due.id ||
+              r.dues_id === due.id
+            );
+            const isPaid = !!receipt;
             return (
               <DueCard
                 key={due.id}

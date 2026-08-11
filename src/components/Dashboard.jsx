@@ -59,10 +59,16 @@ function TransactionRow({ receipt, onView }) {
 }
 
 export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavigate }) {
-  const totalPaid    = receipts.reduce((s, r) => s + r.amount, 0);
-  const paidDues     = dues.filter(d => receipts.some(r => r.duesName === d.name));
-  const pendingDues  = dues.filter(d => !receipts.some(r => r.duesName === d.name));
-  const totalPending = pendingDues.reduce((s, d) => s + d.amount, 0);
+  const isReceiptForDue = (r, d) => (
+    (r.duesName && d.name && r.duesName.trim().toLowerCase() === d.name.trim().toLowerCase()) ||
+    r.duesId === d.id ||
+    r.dues_id === d.id
+  );
+
+  const totalPaid    = receipts.reduce((s, r) => s + (r.amount || 0), 0);
+  const paidDues     = dues.filter(d => receipts.some(r => isReceiptForDue(r, d)));
+  const pendingDues  = dues.filter(d => !receipts.some(r => isReceiptForDue(r, d)));
+  const totalPending = pendingDues.reduce((s, d) => s + (d.amount || 0), 0);
   const overdueDues  = pendingDues.filter(d => d.isOverdue);
   const pct          = dues.length ? Math.round((paidDues.length / dues.length) * 100) : 0;
 
