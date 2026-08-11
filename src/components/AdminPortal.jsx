@@ -95,6 +95,10 @@ export default function AdminPortal({ user, onLogout }) {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
+  // User Clearance Inspector Modal
+  const [inspectUser, setInspectUser] = useState(null);
+  const [userStandingFilter, setUserStandingFilter] = useState('all');
+
   // Org settings
   const [orgSettings, setOrgSettings] = useState({
     name: 'Student Union Government',
@@ -665,6 +669,7 @@ export default function AdminPortal({ user, onLogout }) {
                         <th className="table-th">Matric / Staff ID</th>
                         <th className="table-th">Email</th>
                         <th className="table-th">Department</th>
+                        <th className="table-th text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -679,6 +684,15 @@ export default function AdminPortal({ user, onLogout }) {
                           <td className="table-td font-mono">{p.matricNo || p.staffId || '—'}</td>
                           <td className="table-td text-slate-500">{p.email}</td>
                           <td className="table-td text-slate-600">{p.department || '—'}</td>
+                          <td className="table-td text-right">
+                            <button
+                              onClick={() => { setInspectUser(p); setUserStandingFilter('all'); }}
+                              className="btn-secondary h-7 text-2xs px-2.5 gap-1.5 font-semibold"
+                            >
+                              <Eye className="h-3.5 w-3.5 text-brand-orange" strokeWidth={1.5} />
+                              Inspect Dues
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -901,6 +915,163 @@ export default function AdminPortal({ user, onLogout }) {
           </div>
         </div>
       )}
+
+      {/* ── USER CLEARANCE INSPECTION MODAL ────────────────────────────────────── */}
+      {inspectUser && (() => {
+        const userRole = inspectUser.role || 'student';
+        const userTargetDues = duesList.filter(d => d.roleTarget === 'all' || d.roleTarget === userRole);
+        const userPayerId = inspectUser.matricNo || inspectUser.staffId || inspectUser.email;
+
+        const duesWithStatus = userTargetDues.map(due => {
+          const receipt = allReceipts.find(r =>
+            (r.payerId === userPayerId || r.payerName === inspectUser.name) &&
+            (r.duesName?.toLowerCase().trim() === due.name?.toLowerCase().trim() || r.category === due.category)
+          );
+
+          const isPaid = !!receipt;
+          const isOverdue = !isPaid && due.deadline && new Date(due.deadline) < new Date();
+          const status = isPaid ? 'paid' : (isOverdue ? 'overdue' : 'unpaid');
+
+          return { ...due, status, receipt };
+        });
+
+        const paidCount = duesWithStatus.filter(d => d.status === 'paid').length;
+        const unpaidCount = duesWithStatus.filter(d => d.status === 'unpaid').length;
+        const overdueCount = duesWithStatus.filter(d => d.status === 'overdue').length;
+
+        const displayedDues = duesWithStatus.filter(d => {
+          if (userStandingFilter === 'all') return true;
+          return d.status === userStandingFilter;
+        });
+
+        return (
+          <div className="fixed inset-0 z-50 bg-slate-900/30 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-xl shadow-xl border border-slate-200/80 w-full max-w-2xl overflow-hidden animate-scale-in max-h-[90vh] flex flex-col">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-900">{inspectUser.name}</h3>
+                    <span className={`badge-${inspectUser.role === 'student' ? 'neutral' : 'warning'} text-2xs uppercase`}>
+                      {inspectUser.role}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 font-mono mt-0.5">
+                    {inspectUser.matricNo || inspectUser.staffId} &middot; {inspectUser.department || 'General'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setInspectUser(null)}
+                  className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+                >
+                  <X className="h-5 w-5" strokeWidth={1.5} />
+                </button>
+              </div>
+
+              {/* Summary Stats Bar */}
+              <div className="p-4 bg-slate-100/60 border-b border-slate-100 grid grid-cols-4 gap-2 text-center text-xs">
+                <div className="bg-white p-2.5 rounded-lg border border-slate-200/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Dues</p>
+                  <p className="text-lg font-bold text-slate-900">{duesWithStatus.length}</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-lg border border-slate-200/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Paid (Cleared)</p>
+                  <p className="text-lg font-bold text-emerald-600">{paidCount}</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-lg border border-slate-200/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Unpaid (Pending)</p>
+                  <p className="text-lg font-bold text-amber-600">{unpaidCount}</p>
+                </div>
+                <div className="bg-white p-2.5 rounded-lg border border-slate-200/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-red-600">Overdue</p>
+                  <p className="text-lg font-bold text-red-600">{overdueCount}</p>
+                </div>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="px-6 pt-4 flex gap-2 border-b border-slate-100 bg-white">
+                {[
+                  { id: 'all', label: `All Dues (${duesWithStatus.length})` },
+                  { id: 'paid', label: `Paid (${paidCount})` },
+                  { id: 'unpaid', label: `Unpaid (${unpaidCount})` },
+                  { id: 'overdue', label: `Overdue (${overdueCount})` },
+                ].map(({ id, label }) => (
+                  <button
+                    key={id}
+                    onClick={() => setUserStandingFilter(id)}
+                    className={`tab-btn text-xs px-3 py-2 ${userStandingFilter === id ? 'active' : ''}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Dues List */}
+              <div className="p-6 overflow-y-auto space-y-3 flex-1">
+                {displayedDues.length === 0 ? (
+                  <div className="text-center py-8 text-slate-400 text-xs">
+                    No dues match the selected filter standing.
+                  </div>
+                ) : (
+                  displayedDues.map(due => (
+                    <div key={due.id} className="p-4 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold text-slate-900">{due.name}</p>
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-600">
+                            {due.category}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500">{due.description}</p>
+                        {due.status === 'paid' && due.receipt && (
+                          <p className="text-2xs font-mono text-emerald-600 font-semibold pt-1">
+                            Ref: {due.receipt.txRef} &middot; Paid on {due.receipt.createdAt ? new Date(due.receipt.createdAt).toLocaleDateString() : 'Recorded'}
+                          </p>
+                        )}
+                        {due.status !== 'paid' && due.deadline && (
+                          <p className={`text-2xs font-semibold ${due.status === 'overdue' ? 'text-red-500' : 'text-slate-400'}`}>
+                            Deadline: {new Date(due.deadline).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-bold text-slate-900 mb-1">₦{due.amount.toLocaleString()}</p>
+                        {due.status === 'paid' && (
+                          <span className="badge-success gap-1">
+                            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                            Cleared
+                          </span>
+                        )}
+                        {due.status === 'unpaid' && (
+                          <span className="badge-warning gap-1">
+                            <Clock className="h-3 w-3 text-amber-600" />
+                            Pending
+                          </span>
+                        )}
+                        {due.status === 'overdue' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-2xs font-bold uppercase tracking-wider bg-red-50 text-red-600 border border-red-200">
+                            <AlertCircle className="h-3 w-3 text-red-600" />
+                            Overdue
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-3 border-t border-slate-100 bg-slate-50 flex justify-between items-center text-xs">
+                <span className="text-slate-400 text-2xs">Clearance Verification Standing for {inspectUser.name}</span>
+                <button onClick={() => setInspectUser(null)} className="btn-secondary h-8 text-xs px-4">
+                  Close Standing View
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
