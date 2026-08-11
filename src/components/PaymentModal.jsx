@@ -104,29 +104,45 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
 
   if (!isOpen || !due) return null;
 
-  // Live Mode loading state
+  // Live Mode Flutterwave Gateway Card
   if (useLiveGateway) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-        <div className="w-full max-w-sm rounded-xl bg-white p-8 text-center shadow-lg border border-slate-200/80">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-brand-orange/10 text-brand-orange">
-            <RefreshCw className="h-6 w-6 animate-spin" strokeWidth={1.5} />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fade-in">
+        <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl border border-slate-200/80 space-y-5 text-center">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="text-left">
+              <p className="text-2xs font-bold uppercase tracking-wider text-slate-400">Flutterwave Gateway</p>
+              <p className="text-sm font-bold text-slate-900 truncate max-w-[200px]">{due.name}</p>
+            </div>
+            <button onClick={onClose} className="h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50">
+              <X className="h-4 w-4" strokeWidth={1.5} />
+            </button>
           </div>
-          <h3 className="text-base font-bold text-slate-900 mb-1">
-            Launching Gateway
-          </h3>
-          <p className="text-xs text-slate-500 mb-6">
-            Opening secure checkout panel for {due.name}
-          </p>
+
+          <div className="p-4 bg-slate-50 rounded-xl space-y-1">
+            <p className="text-2xs font-bold uppercase tracking-wider text-slate-400">Total Amount</p>
+            <p className="text-2xl font-extrabold text-slate-900">&#8358;{due.amount.toLocaleString()}</p>
+            <p className="text-2xs text-slate-500 font-mono truncate">{user?.email || 'student@futa.edu.ng'}</p>
+          </div>
+
+          <button
+            onClick={triggerFlutterwaveSDK}
+            className="btn-primary w-full h-11 text-xs font-semibold justify-center shadow-lg gap-2"
+          >
+            <ShieldCheck className="h-4 w-4 text-brand-orange" strokeWidth={1.5} />
+            Pay Now via Flutterwave
+          </button>
+
           <button
             onClick={onClose}
             className="btn-secondary w-full text-xs h-9"
           >
             Cancel Payment
           </button>
-          <div className="mt-4 flex items-center justify-center gap-1.5 text-2xs text-slate-400">
-            <ShieldCheck className="h-3.5 w-3.5 text-brand-teal" strokeWidth={1.5} />
-            <span>Secured via Flutterwave</span>
+
+          <div className="pt-2 flex items-center justify-center gap-1.5 text-2xs text-slate-400 font-medium">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" strokeWidth={1.5} />
+            <span>Encrypted via Flutterwave F4B Payment Gateway</span>
           </div>
         </div>
       </div>
