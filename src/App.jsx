@@ -906,53 +906,14 @@ export default function App() {
         due={selectedDue}
         user={user}
         settings={settings}
-        onPaymentSuccess={async (receipt) => {
-          // 1. Try Spring Boot REST API
-          const token = localStorage.getItem('ucleare_token');
-          if (token) {
-            try {
-              const matchedDue = duesCatalog.find(d => d.name === receipt.duesName);
-              await fetch(`${API_BASE}/receipts`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                  txRef: receipt.tx_ref,
-                  duesId: matchedDue?.id || null,
-                  duesName: receipt.duesName,
-                  category: receipt.category,
-                  amount: receipt.amount,
-                  paymentMethod: receipt.paymentMethod
-                })
-              });
-              console.log('[Spring Boot] Receipt recorded successfully in MySQL.');
-            } catch (err) {
-              console.error('[Spring Boot] Failed to record receipt:', err);
-            }
-          }
+        onPaymentSuccess={(receipt) => {
+          // 1. Immediately open Receipt Modal and update UI state (NON-BLOCKING!)
+          setReceipts(p => [receipt, ...p.filter(r => r.tx_ref !== receipt.tx_ref)]);
+          setSelectedReceipt(receipt);
+          setReceiptOpen(true);
+          setPaymentOpen(false);
 
-          // 2. Also write to Firestore (if connected)
-          if (db && user && user.id) {
-            try {
-              const matchedDue = duesCatalog.find(d => d.name === receipt.duesName);
-              const receiptsRef = collection(db, 'receipts');
-              await addDoc(receiptsRef, {
-                tx_ref: receipt.tx_ref,
-                payer_id: user.id,
-                dues_id: matchedDue?.id || null,
-                dues_name: receipt.duesName,
-                category: receipt.category,
-                amount: receipt.amount,
-                payment_method: receipt.paymentMethod,
-                created_at: new Date().toISOString()
-              });
-              console.log('[Firebase] Payment recorded successfully.');
-            } catch (err) {
-              console.error('[Firebase] Failed to write receipt:', err.message);
-            }
-          }
+          // 2. Persist to localStorage immediately
           try {
             const localStr = localStorage.getItem('ucleare_receipts');
             let local = localStr ? JSON.parse(localStr) : [];
@@ -963,10 +924,27 @@ export default function App() {
           } catch (e) {
             console.warn('Failed to cache new receipt:', e);
           }
-          setReceipts(p => [receipt, ...p]);
-          setPaymentOpen(false);
-          setSelectedReceipt(receipt);
-          setReceiptOpen(true);
+
+          // 3. Asynchronously sync to Backend API in background (Non-blocking)
+          const token = localStorage.getItem('ucleare_token');
+          if (token) {
+            const matchedDue = duesCatalog.find(d => d.name === receipt.duesName);
+            fetch(`${API_BASE}/receipts`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                txRef: receipt.tx_ref,
+                duesId: matchedDue?.id || null,
+                duesName: receipt.duesName,
+                category: receipt.category,
+                amount: receipt.amount,
+                paymentMethod: receipt.paymentMethod
+              })
+            }).catch(err => console.warn('[Spring Boot] Async receipt sync notice:', err));
+          }
         }}
       />
     </div>
