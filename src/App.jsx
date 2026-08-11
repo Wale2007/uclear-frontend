@@ -480,7 +480,77 @@ export default function App() {
     );
   }
 
-  // UNAUTHENTICATED Login
+  // Dedicated Standalone Executive Admin Login Page
+  if (!isAuthenticated && isAdminPath) {
+    return (
+      <div className="min-h-screen bg-slate-50 font-sans flex flex-col items-center justify-center p-4 antialiased">
+        <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200/80 shadow-xl p-8 space-y-6 animate-scale-in">
+          <div className="text-center space-y-3">
+            <div className="inline-flex h-12 w-12 rounded-xl bg-brand-orange/10 text-brand-orange items-center justify-center mx-auto shadow-sm">
+              <ShieldCheck className="h-6 w-6" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">Uclear Executive Portal</h2>
+              <p className="text-xs text-slate-500 mt-1">Sign in with your institutional administrator credentials</p>
+            </div>
+          </div>
+
+          <form onSubmit={doLogin} className="space-y-4">
+            {loginError && (
+              <div className="p-3 bg-red-50 border border-red-200/50 rounded-lg flex gap-2 text-xs text-red-600 font-semibold">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="block text-2xs font-bold uppercase tracking-wider text-slate-400">
+                Admin Email / ID Code
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. sug.admin@futa.edu.ng"
+                value={loginId}
+                onChange={e => { setLoginId(e.target.value); setLoginError(''); }}
+                className="field font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-2xs font-bold uppercase tracking-wider text-slate-400">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                placeholder="Enter account password"
+                value={loginPassword}
+                onChange={e => { setLoginPassword(e.target.value); setLoginError(''); }}
+                className="field"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="btn-primary w-full h-11 text-xs font-semibold justify-center shadow-lg"
+            >
+              {isLoggingIn ? 'Authenticating Admin...' : 'Sign In to Executive Console'}
+            </button>
+          </form>
+
+          <div className="pt-4 border-t border-slate-100 text-center">
+            <a href="/" className="text-xs text-slate-400 hover:text-slate-700 font-semibold transition-colors">
+              &larr; Return to Student &amp; Staff Portal
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // UNAUTHENTICATED Login (Student & Staff)
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-white font-sans antialiased">
