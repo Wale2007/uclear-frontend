@@ -310,10 +310,24 @@ export default function AdminPortal({ user, onLogout }) {
   };
 
   // ── Derived data ───────────────────────────────────────────────────────────
+  // Helper to determine logged-in admin's payment scope
+  const getAdminScope = (adminUser) => {
+    const email = adminUser?.email?.toLowerCase() || '';
+    const dept = adminUser?.department?.toLowerCase() || '';
+    if (email.includes('sug') || dept.includes('student union')) return { label: 'SUG / Student Union Levies', category: 'Student Union' };
+    if (email.includes('computing') || email.includes('fac') || dept.includes('deanery')) return { label: 'Faculty of Computing Levies', category: 'Faculty' };
+    if (email.includes('sen') || email.includes('dep') || dept.includes('software')) return { label: 'Software Engineering Dept Dues', category: 'Departmental' };
+    return { label: 'All University Levies (Super Admin)', category: 'All' };
+  };
+
+  const adminScope = getAdminScope(user);
+
+  // Exclude Admin accounts from Student & Staff Registry list
   const filteredProfiles = profiles.filter(p => {
-    const matchesRole = roleFilter === 'all' || p.role?.toLowerCase() === roleFilter;
+    const isNotAdmin = p.role?.toLowerCase() !== 'admin';
+    const matchesRole = roleFilter === 'all' ? isNotAdmin : p.role?.toLowerCase() === roleFilter;
     const q = searchTerm.toLowerCase();
-    return matchesRole && (!q ||
+    return isNotAdmin && matchesRole && (!q ||
       p.name?.toLowerCase().includes(q) ||
       p.matricNo?.toLowerCase().includes(q) ||
       p.staffId?.toLowerCase().includes(q) ||
@@ -351,7 +365,7 @@ export default function AdminPortal({ user, onLogout }) {
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold tracking-tight text-slate-900">Uclear Executive Console</span>
               <span className="bg-brand-orange/10 text-brand-orange border border-brand-orange/20 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
-                Admin
+                {adminScope.label}
               </span>
             </div>
             <p className="text-2xs text-slate-500 font-medium">{user?.name || 'Organization Executive'}</p>
@@ -396,9 +410,10 @@ export default function AdminPortal({ user, onLogout }) {
           </div>
 
           <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-1 text-2xs">
-            <p className="font-bold text-brand-orange uppercase tracking-wider">Active Administrator</p>
+            <p className="font-bold text-brand-orange uppercase tracking-wider">Active Jurisdiction</p>
             <p className="font-semibold text-slate-800 truncate">{user?.name}</p>
             <p className="text-slate-500 font-mono">{user?.staffId || user?.email}</p>
+            <p className="text-[10px] font-semibold text-brand-teal pt-1">{adminScope.label}</p>
           </div>
         </aside>
 
