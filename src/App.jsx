@@ -490,7 +490,7 @@ export default function App() {
               <ShieldCheck className="h-6 w-6" strokeWidth={1.5} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Uclear Executive Portal</h2>
+              <h2 className="text-lg font-bold text-slate-900">Uclear Admin Portal</h2>
               <p className="text-xs text-slate-500 mt-1">Sign in with your institutional administrator credentials</p>
             </div>
           </div>
@@ -536,7 +536,7 @@ export default function App() {
               disabled={isLoggingIn}
               className="btn-primary w-full h-11 text-xs font-semibold justify-center shadow-lg"
             >
-              {isLoggingIn ? 'Authenticating Admin...' : 'Sign In to Executive Console'}
+              {isLoggingIn ? 'Authenticating Admin...' : 'Sign In to Admin Portal'}
             </button>
           </form>
 

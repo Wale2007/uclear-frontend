@@ -344,7 +344,7 @@ export default function AdminPortal({ user, onLogout }) {
   });
 
   const ADMIN_NAV = [
-    { id: 'overview',     label: 'Executive Dashboard',    Icon: LayoutDashboard },
+    { id: 'overview',     label: 'Admin Dashboard',        Icon: LayoutDashboard },
     { id: 'dues_manager', label: 'Dues & Levies Manager',  Icon: CreditCard      },
     { id: 'registry',     label: 'Institutional Registry', Icon: Users           },
     { id: 'ledger',       label: 'Clearance Audit Ledger', Icon: FileText        },
@@ -363,12 +363,12 @@ export default function AdminPortal({ user, onLogout }) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold tracking-tight text-slate-900">Uclear Executive Console</span>
+              <span className="text-sm font-bold tracking-tight text-slate-900">Uclear Admin Portal</span>
               <span className="bg-brand-orange/10 text-brand-orange border border-brand-orange/20 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
                 {adminScope.label}
               </span>
             </div>
-            <p className="text-2xs text-slate-500 font-medium">{user?.name || 'Organization Executive'}</p>
+            <p className="text-2xs text-slate-500 font-medium">{user?.name || 'Organization Administrator'}</p>
           </div>
         </div>
 
