@@ -88,11 +88,19 @@ export default function App() {
   const [publicReceiptLoading, setPublicReceiptLoading] = useState(false);
   const [publicReceiptError, setPublicReceiptError] = useState(null);
 
+  const [isAdminPath, setIsAdminPath] = useState(false);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const receiptParam = params.get('receipt');
     if (receiptParam) {
       setPublicReceiptTxRef(receiptParam);
+    }
+
+    const path = window.location.pathname.toLowerCase();
+    if (path.startsWith('/admin')) {
+      setIsAdminPath(true);
+      setUserRole('admin');
     }
   }, []);
 
@@ -508,26 +516,49 @@ export default function App() {
               <div className="lg:hidden pb-4">
                 <Logo size="md" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900">Sign in to your account</h2>
-              <p className="text-xs text-slate-500">Enter your credentials to access your clearance portal</p>
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                {isAdminPath ? (
+                  <>
+                    <ShieldCheck className="h-5 w-5 text-brand-orange" strokeWidth={1.5} />
+                    Executive Admin Portal
+                  </>
+                ) : (
+                  'Sign in to your account'
+                )}
+              </h2>
+              <p className="text-xs text-slate-500">
+                {isAdminPath
+                  ? 'Sign in with your institutional administrator credentials'
+                  : 'Enter your credentials to access your clearance portal'}
+              </p>
             </div>
 
-            <div className="tabs-container">
-              {[
-                { role: 'student', label: 'Student' },
-                { role: 'staff', label: 'Staff' },
-                { role: 'admin', label: 'Admin / Exec' }
-              ].map(({ role, label }) => (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => { setUserRole(role); setLoginId(''); setLoginError(''); }}
-                  className={`tab-btn ${userRole === role ? 'active' : ''}`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            {!isAdminPath ? (
+              <div className="tabs-container">
+                {[
+                  { role: 'student', label: 'Student' },
+                  { role: 'staff', label: 'Staff' }
+                ].map(({ role, label }) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => { setUserRole(role); setLoginId(''); setLoginError(''); }}
+                    className={`tab-btn ${userRole === role ? 'active' : ''}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="p-3 bg-brand-orange/10 border border-brand-orange/20 rounded-xl text-xs font-bold text-brand-orange flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4" strokeWidth={1.5} /> Restricted Executive Portal
+                </span>
+                <a href="/" className="text-2xs text-slate-500 hover:text-slate-800 underline font-semibold">
+                  Back to Portal
+                </a>
+              </div>
+            )}
 
             <form onSubmit={doLogin} className="space-y-4">
               {loginError && (
