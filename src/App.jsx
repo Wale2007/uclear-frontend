@@ -316,12 +316,8 @@ export default function App() {
               const localStr = localStorage.getItem('ucleare_receipts');
               if (localStr) {
                 const local = JSON.parse(localStr);
-                const payerIdVal = profile.matricNo || profile.staffId;
                 local.forEach(lr => {
-                  if (
-                    (lr.payerId === payerIdVal || lr.email === profile.email) &&
-                    !receiptsData.some(r => r.tx_ref === lr.tx_ref)
-                  ) {
+                  if (lr && lr.tx_ref && !receiptsData.some(r => r.tx_ref === lr.tx_ref)) {
                     receiptsData.unshift(lr);
                   }
                 });
@@ -451,12 +447,8 @@ export default function App() {
         const localStr = localStorage.getItem('ucleare_receipts');
         if (localStr) {
           const local = JSON.parse(localStr);
-          const payerIdVal = found.matricNo || found.staffId;
           local.forEach(lr => {
-            if (
-              (lr.payerId === payerIdVal || lr.email === found.email || lr.payerName === found.name) &&
-              !allUserReceipts.some(r => r.tx_ref === lr.tx_ref)
-            ) {
+            if (lr && lr.tx_ref && !allUserReceipts.some(r => r.tx_ref === lr.tx_ref)) {
               allUserReceipts.unshift(lr);
             }
           });
