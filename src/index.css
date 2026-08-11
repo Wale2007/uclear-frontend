@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base Styles & Resets ──────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 14px;
+    height: 100%;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans h-full;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  #root {
+    @apply min-h-screen flex flex-col w-full;
+  }
+
+  h1 { @apply text-2xl font-bold tracking-tight text-slate-900; }
+  h2 { @apply text-lg font-semibold tracking-tight text-slate-900; }
+  h3 { @apply text-sm font-semibold text-slate-800; }
+  
+  p { @apply text-sm leading-relaxed text-slate-500; }
+  
+  input, select, textarea {
+    @apply font-sans;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-orange/40 rounded-lg;
+  }
+}
+
+/* ─── Component Styling ──────────────────────────────────────────────────── */
+@layer components {
+
+  /* Cards */
+  .card-premium {
+    @apply bg-white border border-slate-200/80 rounded-xl shadow-card transition-all duration-150;
+  }
+  .card-premium-hover {
+    @apply card-premium transition-all duration-150;
+  }
+  .card-premium-hover:hover {
+    @apply shadow-card-hover -translate-y-[1px];
+  }
+
+  /* Form Fields */
+  .form-input {
+    @apply w-full h-10 px-3.5 rounded-lg border border-slate-200 bg-white text-sm text-slate-900 
+           placeholder-slate-400/80 transition-colors duration-150
+           focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange/30
+           disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed;
+  }
+
+  .form-select {
+    @apply form-input pr-8 appearance-none bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+  }
+
+  .field {
+    @apply form-input;
+  }
+  select.field {
+    @apply form-select;
+  }
+
+  /* Buttons */
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg text-sm font-medium 
+           transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+
+  .btn-primary {
+    @apply btn-base bg-brand-orange text-white hover:bg-orange-600 hover:shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply btn-base bg-white text-slate-700 border border-slate-200
+           hover:bg-slate-50 hover:border-slate-300;
+  }
+
+  .btn-danger {
+    @apply btn-base bg-red-600 text-white hover:bg-red-700;
+  }
+
+  /* Segmented tab control */
+  .tabs-container {
+    @apply flex bg-slate-100 p-1 rounded-lg border border-slate-200/40;
+  }
+  .tab-btn {
+    @apply flex-1 py-1.5 px-3 text-xs font-medium text-slate-600 rounded-md transition-all;
+  }
+  .tab-btn.active {
+    @apply bg-white text-slate-900 shadow-sm font-semibold;
+  }
+
+  /* Badges */
+  .badge-neutral {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-2xs font-semibold uppercase tracking-wider
+           bg-slate-100 text-slate-600 border border-slate-200/50;
+  }
+  .badge-success {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-2xs font-semibold uppercase tracking-wider
+           bg-emerald-50 text-emerald-700 border border-emerald-200/40;
+  }
+  .badge-warning {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-2xs font-semibold uppercase tracking-wider
+           bg-amber-50 text-amber-700 border border-amber-200/40;
+  }
+  .badge-error {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-2xs font-semibold uppercase tracking-wider
+           bg-red-50 text-red-700 border border-red-200/40;
+  }
+
+  /* Sidebar nav */
+  .sidebar-item {
+    @apply w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium
+           text-slate-600 transition-colors duration-150 
+           hover:bg-slate-100/70 hover:text-slate-900;
+  }
+  .sidebar-item.active {
+    @apply bg-brand-orange/10 text-brand-orange font-semibold border-r-2 border-brand-orange;
+  }
+  .nav-item {
+    @apply sidebar-item;
+  }
+  .nav-item.active {
+    @apply bg-slate-100 text-slate-900 font-semibold;
+  }
+
+  /* Tables */
+  .table-container {
+    @apply bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden;
+  }
+  .table-header {
+    @apply border-b border-slate-100 bg-slate-50/50;
+  }
+  .table-th {
+    @apply px-5 py-3.5 text-left text-2xs font-semibold uppercase tracking-wider text-slate-400;
+  }
+  .table-td {
+    @apply px-5 py-4 border-b border-slate-100 last:border-b-0 text-sm;
+  }
+}
+
+/* ─── Signature font ─────────────────────────────────────────────────────── */
+.font-signature {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ─── Custom Scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ─── Micro-animations ───────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in  { animation: fadeIn  0.18s ease both; }
+.animate-scale-in { animation: scaleIn 0.15s ease both; }
+
+/* Print: dedicated popup window handles printing - no @media print needed */
+/* The receipt opens in its own clean popup (see ReceiptModal.jsx handlePrint).   */
+/* The public receipt page (QR scan) still uses window.print() with these rules: */
+@media print {
+  body > *:not(#public-receipt-root) {
+    display: none !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 14mm 16mm;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  #print-receipt-area {
+    position: static !important;
+    width: 100% !important;
+    padding: 0 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  #print-receipt-area table,
+  #print-receipt-area .border {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  button, header, aside, nav, .print\:hidden {
+    display: none !important;
+  }
+}
