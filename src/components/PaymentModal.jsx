@@ -51,29 +51,26 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
         logo: 'https://res.cloudinary.com/flutterwave/image/upload/v1595492543/flutterwave-logo-colored.svg',
       },
       callback: function (data) {
-        if (data.status === 'successful' || data.status === 'completed') {
-          setIsProcessing(true);
-          setTimeout(() => {
-            onPaymentSuccess({
-              id: data.transaction_id || Date.now(),
-              tx_ref: data.tx_ref || txRef,
-              amount: due.amount,
-              duesName: due.name,
-              category: due.category,
-              date: new Date().toISOString(),
-              paymentMethod: data.charge_type || 'Flutterwave',
-              email: user?.email,
-              phone: user?.phone,
-              payerName: user?.name,
-              payerId: user?.matricNo || user?.staffId,
-            });
-            setIsProcessing(false);
-            onClose();
-          }, 800);
+        if (data.status === 'successful' || data.status === 'completed' || data.tx_ref) {
+          const newReceipt = {
+            id: data.transaction_id || Date.now(),
+            tx_ref: data.tx_ref || txRef,
+            amount: due.amount,
+            duesName: due.name,
+            category: due.category,
+            date: new Date().toISOString(),
+            paymentMethod: data.charge_type || 'Flutterwave',
+            email: user?.email,
+            phone: user?.phone,
+            payerName: user?.name,
+            payerId: user?.matricNo || user?.staffId,
+          };
+          onPaymentSuccess(newReceipt);
+          onClose();
         }
       },
       onclose: function () {
-        if (!isProcessing) onClose();
+        onClose();
       },
     });
   };
