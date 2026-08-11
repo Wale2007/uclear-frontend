@@ -36,7 +36,11 @@ import {
   Loader2,
 } from 'lucide-react';
 
+import { MOCK_STUDENTS, MOCK_STAFF } from '../data/mockDatabase';
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+
+const DEFAULT_PROFILES = [...MOCK_STUDENTS, ...MOCK_STAFF];
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
 function StatusBadge({ active }) {
@@ -57,8 +61,8 @@ export default function AdminPortal({ user, onLogout }) {
   const [adminTab, setAdminTab] = useState('overview');
 
   // Data state
-  const [stats, setStats] = useState({ totalStudents: 0, totalStaff: 0, totalReceipts: 0, totalRevenue: 0 });
-  const [profiles, setProfiles] = useState([]);
+  const [stats, setStats] = useState({ totalStudents: MOCK_STUDENTS.length, totalStaff: MOCK_STAFF.length, totalReceipts: 0, totalRevenue: 0 });
+  const [profiles, setProfiles] = useState(DEFAULT_PROFILES);
   const [duesList, setDuesList] = useState([]);
   const [allReceipts, setAllReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,7 +123,12 @@ export default function AdminPortal({ user, onLogout }) {
       // 2. Profiles
       try {
         const pRes = await fetch(`${API_BASE}/admin/profiles`, { headers });
-        if (pRes.ok) setProfiles(await pRes.json());
+        if (pRes.ok) {
+          const fetchedP = await pRes.json();
+          if (Array.isArray(fetchedP) && fetchedP.length > 0) {
+            setProfiles(fetchedP);
+          }
+        }
       } catch (e) { console.warn('[Admin] Profiles fetch error:', e); }
 
       // 3. Dues
