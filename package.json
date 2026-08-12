@@ -10,10 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.110.0",
     "autoprefixer": "^10.5.2",
-    "firebase": "12.15.0",
-    "firebase-admin": "^14.1.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.23.0",

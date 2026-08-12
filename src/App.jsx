@@ -24,8 +24,6 @@ import PaymentModal from './components/PaymentModal';
 import Settings from './components/Settings';
 import AdminPortal from './components/AdminPortal';
 import { MOCK_DUES, MOCK_STUDENTS, MOCK_STAFF, authenticateMockUser } from './data/mockDatabase';
-import { db } from './firebaseClient';
-import { collection, query, where, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://uclear-backend.onrender.com/api';
 
