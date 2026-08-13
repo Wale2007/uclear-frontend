@@ -123,7 +123,8 @@ export default function Settings({ user, onUpdateUser, settings, onUpdateSetting
           </form>
         </div>
 
-        {/* Gateway Configuration Card */}
+        {/* Gateway Configuration Card — Admin Only */}
+        {user.role === 'admin' && (
         <div className="card-premium p-6 lg:col-span-2 space-y-6 flex flex-col justify-between">
           <div className="space-y-6">
             <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
@@ -209,6 +210,7 @@ export default function Settings({ user, onUpdateUser, settings, onUpdateSetting
             <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
           </a>
         </div>
+        )}
       </div>
 
       {/* Institutional Reference */}
