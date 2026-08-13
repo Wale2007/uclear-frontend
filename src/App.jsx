@@ -171,12 +171,23 @@ export default function App() {
           }
         }
 
-        // 2. Try localStorage (for mock mode persistence across page reloads/scans)
+        // 2. Try user-specific localStorage (for mock mode persistence)
         if (!foundReceipt) {
-          const localReceiptsStr = localStorage.getItem('ucleare_receipts');
-          if (localReceiptsStr) {
-            const localReceipts = JSON.parse(localReceiptsStr);
-            foundReceipt = localReceipts.find(r => r.tx_ref === publicReceiptTxRef);
+          const knownKeys = Object.keys(localStorage).filter(k => k.startsWith('ucleare_receipts_'));
+          for (const key of knownKeys) {
+            try {
+              const localReceiptsStr = localStorage.getItem(key);
+              if (localReceiptsStr) {
+                const localReceipts = JSON.parse(localReceiptsStr);
+                const found = localReceipts.find(r => r.tx_ref === publicReceiptTxRef);
+                if (found) {
+                  foundReceipt = found;
+                  break;
+                }
+              }
+            } catch (e) {
+              console.warn('Error reading local storage key:', key, e);
+            }
           }
         }
 
@@ -345,30 +356,21 @@ export default function App() {
       return;
     }
 
-    const base = SEED_RECEIPTS[found.role] || [];
-    const mappedSeed = base.map(r => ({
-      ...r,
-      email:     found.email,
-      phone:     found.phone,
-      payerName: found.name,
-      payerId:   found.matricNo || found.staffId,
-    }));
+    // Use user-specific localStorage key so different users on same device stay isolated
+    const userId = found.matricNo || found.staffId || credential;
+    const storageKey = `ucleare_receipts_${userId}`;
 
-    let allUserReceipts = [...mappedSeed];
-
+    // Only load real payments from this user's local cache — never inject SEED data
+    let allUserReceipts = [];
     try {
-      const localStr = localStorage.getItem('ucleare_receipts');
+      const localStr = localStorage.getItem(storageKey);
       if (localStr) {
-        const local = JSON.parse(localStr);
-        local.forEach(lr => {
-          if (lr && lr.tx_ref && !allUserReceipts.some(r => r.tx_ref === lr.tx_ref)) {
-            allUserReceipts.unshift(lr);
-          }
-        });
+        const parsed = JSON.parse(localStr);
+        // Filter out any seed/demo receipts (tx_ref contains '-SEED')
+        allUserReceipts = parsed.filter(r => r && r.tx_ref && !r.tx_ref.includes('-SEED'));
       }
-      localStorage.setItem('ucleare_receipts', JSON.stringify(allUserReceipts));
     } catch (e) {
-      console.warn('Failed to cache mock receipts:', e);
+      console.warn('Failed to load cached receipts:', e);
     }
 
     setReceipts(allUserReceipts);
@@ -817,13 +819,15 @@ export default function App() {
           setReceiptOpen(true);
           setPaymentOpen(false);
 
-          // 2. Persist to localStorage immediately
+          // 2. Persist to user-specific localStorage immediately (consistent across same-user sessions)
           try {
-            const localStr = localStorage.getItem('ucleare_receipts');
+            const userId = user?.matricNo || user?.staffId || user?.email || 'guest';
+            const storageKey = `ucleare_receipts_${userId}`;
+            const localStr = localStorage.getItem(storageKey);
             let local = localStr ? JSON.parse(localStr) : [];
             if (!local.some(lr => lr.tx_ref === receipt.tx_ref)) {
               local.unshift(receipt);
-              localStorage.setItem('ucleare_receipts', JSON.stringify(local));
+              localStorage.setItem(storageKey, JSON.stringify(local));
             }
           } catch (e) {
             console.warn('Failed to cache new receipt:', e);
