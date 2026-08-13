@@ -225,20 +225,17 @@ export default function App() {
   }, [publicReceiptTxRef]);
 
 
-  // Light mode only - no theme toggle.
-
-  // -- Authentication
+  // -- Authentication (Instant & Mobile-Optimized)
   const doLogin = async (e) => {
-
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoginError('');
     setIsLoggingIn(true);
     const credential = loginId.trim();
 
-    // 1. Try Spring Boot REST API Backend with fast 3.5s timeout
+    // 1. Try Spring Boot REST API Backend with ultra-fast 2.0s timeout
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
@@ -271,75 +268,60 @@ export default function App() {
           title: data.title || ''
         };
 
-        // Fetch Dues from Spring Boot API
-        let duesData = [];
-        try {
-          const duesRes = await fetch(`${API_BASE}/dues?role=${userRole}`);
-          if (duesRes.ok) {
-            const rawDues = await duesRes.json();
-            duesData = rawDues.map(d => ({
-              id: d.id,
-              name: d.name,
-              amount: Number(d.amount),
-              category: d.category,
-              description: d.description,
-              deadline: d.deadline,
-              isOverdue: d.deadline ? new Date(d.deadline) < new Date() : false,
-            }));
-            setDuesCatalog(duesData);
-          }
-        } catch (dErr) {
-          console.warn('[Spring Boot] Dues fetch error:', dErr);
-        }
-
-        // Fetch Receipts from Spring Boot API
-        let receiptsData = [];
-        try {
-          const receiptsRes = await fetch(`${API_BASE}/receipts`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (receiptsRes.ok) {
-            const rawReceipts = await receiptsRes.json();
-            receiptsData = rawReceipts.map(r => ({
-              id: r.id,
-              tx_ref: r.txRef,
-              amount: Number(r.amount),
-              duesName: r.duesName,
-              category: r.category,
-              date: r.createdAt,
-              paymentMethod: r.paymentMethod,
-              email: profile.email,
-              phone: profile.phone,
-              payerName: profile.name,
-              payerId: profile.matricNo || profile.staffId,
-            }));
-
-            // Merge with local storage cached receipts so payments persist across sessions
-            try {
-              const localStr = localStorage.getItem('ucleare_receipts');
-              if (localStr) {
-                const local = JSON.parse(localStr);
-                local.forEach(lr => {
-                  if (lr && lr.tx_ref && !receiptsData.some(r => r.tx_ref === lr.tx_ref)) {
-                    receiptsData.unshift(lr);
-                  }
-                });
-              }
-              localStorage.setItem('ucleare_receipts', JSON.stringify(receiptsData));
-            } catch (e) {
-              console.warn('Failed to sync local receipts:', e);
-            }
-
-            setReceipts(receiptsData);
-          }
-        } catch (rErr) {
-          console.warn('[Spring Boot] Receipts fetch error:', rErr);
-        }
-
+        // Instantly log user in without blocking on secondary network calls!
         setUser(profile);
         setIsAuthenticated(true);
         setActiveTab(profile.role === 'admin' ? 'admin' : 'dashboard');
         setIsLoggingIn(false);
+
+        // Fetch Dues & Receipts in background asynchronously (non-blocking)
+        fetch(`${API_BASE}/dues?role=${userRole}`)
+          .then(r => r.ok ? r.json() : [])
+          .then(rawDues => {
+            if (rawDues && rawDues.length > 0) {
+              setDuesCatalog(rawDues.map(d => ({
+                id: d.id,
+                name: d.name,
+                amount: Number(d.amount),
+                category: d.category,
+                description: d.description,
+                deadline: d.deadline,
+                isOverdue: d.deadline ? new Date(d.deadline) < new Date() : false,
+              })));
+            }
+          })
+          .catch(() => {});
+
+        fetch(`${API_BASE}/receipts`, { headers: { 'Authorization': `Bearer ${token}` } })
+          .then(r => r.ok ? r.json() : [])
+          .then(rawReceipts => {
+            if (rawReceipts && rawReceipts.length > 0) {
+              const receiptsData = rawReceipts.map(r => ({
+                id: r.id,
+                tx_ref: r.txRef,
+                amount: Number(r.amount),
+                duesName: r.duesName,
+                category: r.category,
+                date: r.createdAt,
+                paymentMethod: r.paymentMethod,
+                email: profile.email,
+                phone: profile.phone,
+                payerName: profile.name,
+                payerId: profile.matricNo || profile.staffId,
+              }));
+              setReceipts(prev => {
+                const combined = [...receiptsData];
+                prev.forEach(p => {
+                  if (p && p.tx_ref && !combined.some(c => c.tx_ref === p.tx_ref)) {
+                    combined.unshift(p);
+                  }
+                });
+                return combined;
+              });
+            }
+          })
+          .catch(() => {});
+
         return;
       } else {
         const errorData = await res.json().catch(() => ({}));
@@ -350,124 +332,51 @@ export default function App() {
         }
       }
     } catch (apiErr) {
-      console.warn('[Spring Boot] API connect error, falling back to Firestore/Mock:', apiErr);
+      console.warn('[Spring Boot] Network slow/offline, using instant fallback:', apiErr.message);
     }
-
-    if (db) {
-      try {
-        const queryField = userRole === 'student' ? 'matric_no' : 'staff_id';
-        const profilesRef = collection(db, 'profiles');
-        const qProfile = query(profilesRef, where(queryField, '==', credential));
-        const profileSnap = await getDocs(qProfile);
-
-        if (profileSnap.empty) {
-          throw new Error('Profile record not found in institutional registry.');
-        }
-
-        const profileDoc = profileSnap.docs[0];
-        const profile = { id: profileDoc.id, ...profileDoc.data() };
-
-        const duesRef = collection(db, 'dues');
-        const qDues = query(duesRef, where('role_target', 'in', [userRole, 'all']));
-        const duesSnap = await getDocs(qDues);
-        const duesData = duesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const receiptsRef = collection(db, 'receipts');
-        const qReceipts = query(receiptsRef, where('payer_id', '==', profile.id));
-        const receiptsSnap = await getDocs(qReceipts);
-        const receiptsData = receiptsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const mappedReceipts = receiptsData.map(r => ({
-          id: r.id,
-          tx_ref: r.tx_ref,
-          amount: Number(r.amount),
-          duesName: r.dues_name,
-          category: r.category,
-          date: r.created_at,
-          paymentMethod: r.payment_method,
-          email: profile.email,
-          phone: profile.phone,
-          payerName: profile.name,
-          payerId: profile.matric_no || profile.staff_id,
-        }));
-
-        setDuesCatalog(duesData.map(d => ({
-          id: d.id,
-          name: d.name,
-          amount: Number(d.amount),
-          category: d.category,
-          description: d.description,
-          deadline: d.deadline,
-          isOverdue: d.deadline ? new Date(d.deadline) < new Date() : false,
-        })));
-
-        try {
-          const localStr = localStorage.getItem('ucleare_receipts');
-          let local = localStr ? JSON.parse(localStr) : [];
-          mappedReceipts.forEach(r => {
-            if (!local.some(lr => lr.tx_ref === r.tx_ref)) {
-              local.push(r);
-            }
-          });
-          localStorage.setItem('ucleare_receipts', JSON.stringify(local));
-        } catch (e) {
-          console.warn('Failed to cache receipts:', e);
-        }
-
-        setReceipts(mappedReceipts);
-        setUser(profile);
-        setIsAuthenticated(true);
-        setActiveTab('dashboard');
-        setIsLoggingIn(false);
-        return;
-      } catch (err) {
-        console.warn('[Firebase] Auth fallback to mock database:', err.message);
-      }
-    }
-
-    setTimeout(() => {
-      const found = authenticateMockUser(credential, loginPassword, userRole);
-      if (!found) {
-        let errMsg = 'Invalid Matriculation Number or password.';
-        if (userRole === 'staff') errMsg = 'Invalid Staff ID or password.';
-        if (userRole === 'admin') errMsg = 'Invalid Admin Email/ID or password.';
-        setLoginError(errMsg);
-        setIsLoggingIn(false);
-        return;
-      }
-      const base = SEED_RECEIPTS[found.role] || [];
-      const mappedSeed = base.map(r => ({
-        ...r,
-        email:     found.email,
-        phone:     found.phone,
-        payerName: found.name,
-        payerId:   found.matricNo || found.staffId,
-      }));
-
-      let allUserReceipts = [...mappedSeed];
-
-      try {
-        const localStr = localStorage.getItem('ucleare_receipts');
-        if (localStr) {
-          const local = JSON.parse(localStr);
-          local.forEach(lr => {
-            if (lr && lr.tx_ref && !allUserReceipts.some(r => r.tx_ref === lr.tx_ref)) {
-              allUserReceipts.unshift(lr);
-            }
-          });
-        }
-        localStorage.setItem('ucleare_receipts', JSON.stringify(allUserReceipts));
-      } catch (e) {
-        console.warn('Failed to cache mock receipts:', e);
-      }
-
-      setReceipts(allUserReceipts);
-      setDuesCatalog(MOCK_DUES[found.role] || []);
-      setUser(found);
-      setIsAuthenticated(true);
-      setActiveTab('dashboard');
+    // 2. Instant Fallback to Mock Credentials (0ms delay - Instant mobile login!)
+    const found = authenticateMockUser(credential, loginPassword, userRole);
+    if (!found) {
+      let errMsg = 'Invalid Matriculation Number or password.';
+      if (userRole === 'staff') errMsg = 'Invalid Staff ID or password.';
+      if (userRole === 'admin') errMsg = 'Invalid Admin Email/ID or password.';
+      setLoginError(errMsg);
       setIsLoggingIn(false);
-    }, 700);
+      return;
+    }
+
+    const base = SEED_RECEIPTS[found.role] || [];
+    const mappedSeed = base.map(r => ({
+      ...r,
+      email:     found.email,
+      phone:     found.phone,
+      payerName: found.name,
+      payerId:   found.matricNo || found.staffId,
+    }));
+
+    let allUserReceipts = [...mappedSeed];
+
+    try {
+      const localStr = localStorage.getItem('ucleare_receipts');
+      if (localStr) {
+        const local = JSON.parse(localStr);
+        local.forEach(lr => {
+          if (lr && lr.tx_ref && !allUserReceipts.some(r => r.tx_ref === lr.tx_ref)) {
+            allUserReceipts.unshift(lr);
+          }
+        });
+      }
+      localStorage.setItem('ucleare_receipts', JSON.stringify(allUserReceipts));
+    } catch (e) {
+      console.warn('Failed to cache mock receipts:', e);
+    }
+
+    setReceipts(allUserReceipts);
+    setDuesCatalog(MOCK_DUES[found.role] || []);
+    setUser(found);
+    setIsAuthenticated(true);
+    setActiveTab(found.role === 'admin' ? 'admin' : 'dashboard');
+    setIsLoggingIn(false);
   };
 
   const quickLogin = (role) => {
