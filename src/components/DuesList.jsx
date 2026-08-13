@@ -13,8 +13,17 @@ import {
 const CATEGORIES = ['All', 'Departmental', 'Faculty', 'Student Union', 'Staff Union', 'Other'];
 const STATUSES   = ['All', 'Pending', 'Paid', 'Overdue'];
 
+const checkIsOverdue = (due, isPaid) => {
+  if (isPaid) return false;
+  if (!due.deadline) return !!due.isOverdue;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadlineDate = new Date(due.deadline);
+  return deadlineDate < today;
+};
+
 function DueCard({ due, isPaid, receipt, onPay, onViewReceipt }) {
-  const isOverdue = !isPaid && due.isOverdue;
+  const isOverdue = checkIsOverdue(due, isPaid);
 
   return (
     <div className="card-premium-hover p-6 flex flex-col justify-between h-56">
@@ -78,7 +87,7 @@ export default function DuesList({ dues, receipts, onInitiatePayment, onViewRece
   const filtered = useMemo(() => {
     return dues.filter(due => {
       const isPaid    = receipts.some(r => r.duesName === due.name);
-      const isOverdue = !isPaid && due.isOverdue;
+      const isOverdue = checkIsOverdue(due, isPaid);
 
       const matchStatus =
         status === 'All' ||

@@ -282,7 +282,7 @@ export const MOCK_DUES = {
       category: 'Student Union',
       amount: 2000,
       description: 'Annual SUG developmental levy, welfare, and membership fee covering all student activities.',
-      deadline: '2026-07-31',
+      deadline: '2026-08-31',
       isOverdue: false,
     },
     {
@@ -291,7 +291,7 @@ export const MOCK_DUES = {
       category: 'Faculty',
       amount: 3500,
       description: 'Faculty-level operational fees, seminar series, and newsletter publications.',
-      deadline: '2026-07-15',
+      deadline: '2026-09-15',
       isOverdue: false,
     },
     {
@@ -309,7 +309,7 @@ export const MOCK_DUES = {
       category: 'Other',
       amount: 1500,
       description: 'Annual library card renewal, JSTOR/Elsevier digital journal access, and clearance endorsement.',
-      deadline: '2026-08-30',
+      deadline: '2026-09-30',
       isOverdue: false,
     },
     {
@@ -318,7 +318,7 @@ export const MOCK_DUES = {
       category: 'Other',
       amount: 1000,
       description: 'Covers inter-faculty sports competitions, gym maintenance, and end-of-session cultural fiesta.',
-      deadline: '2026-07-20',
+      deadline: '2026-10-15',
       isOverdue: false,
     },
     {
@@ -338,7 +338,7 @@ export const MOCK_DUES = {
       category: 'Staff Union',
       amount: 5000,
       description: 'Academic Staff Union of Universities standard membership and welfare levy.',
-      deadline: '2026-07-31',
+      deadline: '2026-08-31',
       isOverdue: false,
     },
     {
@@ -347,7 +347,7 @@ export const MOCK_DUES = {
       category: 'Staff Union',
       amount: 3000,
       description: 'Monthly contribution to the staff cooperative society welfare and emergency fund.',
-      deadline: '2026-07-15',
+      deadline: '2026-09-15',
       isOverdue: false,
     },
     {
@@ -365,7 +365,7 @@ export const MOCK_DUES = {
       category: 'Staff Union',
       amount: 2000,
       description: 'Non-Academic Staff Union of Universities dues for technical and administrative staff.',
-      deadline: '2026-07-31',
+      deadline: '2026-10-01',
       isOverdue: false,
     },
   ],

@@ -69,7 +69,9 @@ export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavig
   const paidDues     = dues.filter(d => receipts.some(r => isReceiptForDue(r, d)));
   const pendingDues  = dues.filter(d => !receipts.some(r => isReceiptForDue(r, d)));
   const totalPending = pendingDues.reduce((s, d) => s + (d.amount || 0), 0);
-  const overdueDues  = pendingDues.filter(d => d.isOverdue);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const overdueDues  = pendingDues.filter(d => d.isOverdue || (d.deadline && new Date(d.deadline) < today));
   const pct          = dues.length ? Math.round((paidDues.length / dues.length) * 100) : 0;
 
   const recentReceipts = [...receipts]
