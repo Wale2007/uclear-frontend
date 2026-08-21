@@ -8,17 +8,18 @@ import {
   Mail,
   ArrowRight,
   ArrowLeft,
+  Building,
+  KeyRound,
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
-import { MOCK_ADMINS } from '../data/mockDatabase';
 
 export default function AdminLoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [credential, setCredential] = useState('sug.admin@futa.edu.ng');
-  const [password, setPassword] = useState('password123');
+  const [credential, setCredential] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,45 +38,99 @@ export default function AdminLoginPage() {
     }
   };
 
-  const selectSampleAdmin = (adm) => {
-    setCredential(adm.email);
-    setPassword('password123');
-    setError('');
-  };
-
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex flex-col justify-between p-4 sm:p-6 antialiased">
-      {/* Top Header */}
-      <header className="w-full max-w-6xl mx-auto flex items-center justify-between py-2">
-        <Logo />
-        <Link
-          to="/login"
-          className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-lg border border-slate-200/80 bg-white shadow-sm"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Student Portal
-        </Link>
-      </header>
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-white font-sans antialiased">
+      {/* ── Left Hero Banner (Deep Navy Brand) ── */}
+      <div className="hidden lg:flex lg:col-span-7 relative flex-col justify-between p-12 xl:p-16 text-white bg-[#0A2540] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#08182b] via-[#0A2540] to-[#040e1a] opacity-95" />
 
-      {/* Main Admin Box */}
-      <div className="w-full max-w-md mx-auto my-8">
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xl p-6 sm:p-8 space-y-6 animate-scale-in">
-          {/* Card Header & Shield Badge */}
-          <div className="text-center space-y-3">
-            <div className="inline-flex h-12 w-12 rounded-xl bg-brand-orange/10 text-brand-orange items-center justify-center mx-auto shadow-sm">
-              <ShieldCheck className="h-6 w-6" strokeWidth={1.5} />
+        {/* Ambient decorative glowing circles */}
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-brand-orange/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+
+        {/* Brand Header */}
+        <div className="relative z-10">
+          <Logo size="lg" light />
+        </div>
+
+        {/* Value Proposition Content */}
+        <div className="relative z-10 max-w-xl space-y-8 my-auto">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/20 border border-brand-orange/30 text-brand-orange text-xs font-semibold">
+              <ShieldCheck className="h-4 w-4" />
+              Restricted Institutional Access
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-                Institutional Admin Portal
-              </h1>
-              <p className="text-xs text-slate-500 mt-1">
-                Authorized access for Association Executives, Faculty Deans, and Bursary Officers
-              </p>
-            </div>
+            <h1 className="text-4xl xl:text-5xl font-extrabold tracking-tight leading-tight text-white">
+              Executive Bursary &amp; <br />
+              <span className="text-brand-orange">Dues Administration.</span>
+            </h1>
+            <p className="text-base text-slate-300 leading-relaxed">
+              Authorized portal for Association Executives, Faculty Deans, and Bursary Officers to manage institutional levies, monitor settlement ledgers, and audit student clearances.
+            </p>
           </div>
 
-          {/* Generalized Error Alert */}
+          {/* Security Protocols Notice */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+              <div className="h-8 w-8 rounded-lg bg-brand-orange/20 text-brand-orange flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Building className="h-4 w-4" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-xs font-bold text-white">Multi-Departmental</p>
+                <p className="text-2xs text-slate-400">SUG, Faculty, Departmental &amp; Bursary units</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+              <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <KeyRound className="h-4 w-4" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-xs font-bold text-white">Audit &amp; Compliance</p>
+                <p className="text-2xs text-slate-400">End-to-end ledger verification tracking</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="relative z-10 flex items-center justify-between text-2xs text-slate-400 pt-8 border-t border-white/10">
+          <span>Federal University of Technology, Akure &middot; Executive Admin Portal</span>
+          <span>Security Level 3</span>
+        </div>
+      </div>
+
+      {/* ── Right Login Form Area ── */}
+      <div className="lg:col-span-5 flex flex-col justify-between px-6 sm:px-12 xl:px-16 py-10 bg-slate-50 min-h-screen">
+        {/* Top Return Link */}
+        <div className="flex items-center justify-between">
+          <div className="lg:hidden">
+            <Logo size="md" />
+          </div>
+          <Link
+            to="/login"
+            className="ml-auto text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-lg border border-slate-200/80 bg-white shadow-sm"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Student &amp; Staff Portal
+          </Link>
+        </div>
+
+        {/* Main Form Box */}
+        <div className="w-full max-w-sm mx-auto my-auto space-y-6">
+          <div className="space-y-2">
+            <div className="inline-flex h-10 w-10 rounded-xl bg-brand-orange/10 text-brand-orange items-center justify-center shadow-sm">
+              <ShieldCheck className="h-5 w-5" strokeWidth={1.5} />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+              Executive Admin Portal
+            </h2>
+            <p className="text-xs text-slate-500">
+              Sign in with your institutional administrator credentials
+            </p>
+          </div>
+
+          {/* Generalized Error Box */}
           {error && (
             <div className="p-3.5 bg-red-50 border border-red-200/60 rounded-xl flex items-start gap-2.5 text-xs text-red-600 font-medium animate-fade-in">
               <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
@@ -86,8 +141,8 @@ export default function AdminLoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="block text-2xs font-bold uppercase tracking-wider text-slate-400">
-                Admin Institutional Email / ID
+              <label className="block text-2xs font-bold uppercase tracking-wider text-slate-500">
+                Admin Email / ID Code
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
@@ -107,7 +162,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-2xs font-bold uppercase tracking-wider text-slate-400">
+              <label className="block text-2xs font-bold uppercase tracking-wider text-slate-500">
                 Password
               </label>
               <div className="relative">
@@ -115,7 +170,7 @@ export default function AdminLoginPage() {
                 <input
                   type="password"
                   required
-                  placeholder="••••••••"
+                  placeholder="Enter account password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -130,7 +185,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary w-full h-10 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm"
+              className="btn-primary w-full h-11 text-xs font-semibold flex items-center justify-center gap-2 shadow-md mt-2"
             >
               {isSubmitting ? (
                 <>
@@ -145,37 +200,13 @@ export default function AdminLoginPage() {
               )}
             </button>
           </form>
-
-          {/* Sample Admin Selector */}
-          <div className="pt-4 border-t border-slate-100 space-y-2">
-            <p className="text-2xs font-bold uppercase tracking-wider text-slate-400 text-center">
-              Quick Select Sample Admin:
-            </p>
-            <div className="grid grid-cols-2 gap-1.5 text-2xs">
-              {MOCK_ADMINS.map((adm) => (
-                <button
-                  key={adm.id}
-                  type="button"
-                  onClick={() => selectSampleAdmin(adm)}
-                  className={`p-2 rounded-lg text-left border transition-all ${
-                    credential === adm.email
-                      ? 'border-brand-orange bg-brand-orange/5 text-brand-orange font-bold'
-                      : 'border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  <p className="font-semibold truncate">{adm.name}</p>
-                  <p className="text-[10px] text-slate-400 truncate">{adm.department}</p>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
-      </div>
 
-      {/* Institutional Legal Footer */}
-      <footer className="text-center text-2xs text-slate-400 py-4">
-        &copy; {new Date().getFullYear()} Federal University of Technology, Akure &middot; Executive Bursary & Dues Administration
-      </footer>
+        {/* Footer */}
+        <footer className="text-center text-2xs text-slate-400 pt-6 border-t border-slate-200/60">
+          &copy; {new Date().getFullYear()} Federal University of Technology, Akure &middot; Executive Administration
+        </footer>
+      </div>
     </div>
   );
 }
