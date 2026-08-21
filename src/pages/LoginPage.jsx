@@ -74,29 +74,6 @@ export default function LoginPage() {
               A secure, unified portal for students and staff to manage, pay, and track institutional dues. Instant verification and digitally signed e-receipts.
             </p>
           </div>
-
-          {/* Feature Highlights */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="h-8 w-8 rounded-lg bg-brand-orange/20 text-brand-orange flex items-center justify-center flex-shrink-0 mt-0.5">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-xs font-bold text-white">Instant Verification</p>
-                <p className="text-2xs text-slate-400">Real-time payment clearance and ledger updates</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <ShieldCheck className="h-4 w-4" />
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-xs font-bold text-white">Bursary Clearance</p>
-                <p className="text-2xs text-slate-400">Cryptographically signed digital clearance certificates</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}

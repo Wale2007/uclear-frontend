@@ -56,10 +56,6 @@ export default function AdminLoginPage() {
         {/* Value Proposition Content */}
         <div className="relative z-10 max-w-xl space-y-8 my-auto">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-orange/20 border border-brand-orange/30 text-brand-orange text-xs font-semibold">
-              <ShieldCheck className="h-4 w-4" />
-              Restricted Institutional Access
-            </div>
             <h1 className="text-4xl xl:text-5xl font-extrabold tracking-tight leading-tight text-white">
               Executive Bursary &amp; <br />
               <span className="text-brand-orange">Dues Administration.</span>
@@ -67,29 +63,6 @@ export default function AdminLoginPage() {
             <p className="text-base text-slate-300 leading-relaxed">
               Authorized portal for Association Executives, Faculty Deans, and Bursary Officers to manage institutional levies, monitor settlement ledgers, and audit student clearances.
             </p>
-          </div>
-
-          {/* Security Protocols Notice */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="h-8 w-8 rounded-lg bg-brand-orange/20 text-brand-orange flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Building className="h-4 w-4" />
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-xs font-bold text-white">Multi-Departmental</p>
-                <p className="text-2xs text-slate-400">SUG, Faculty, Departmental &amp; Bursary units</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="h-8 w-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <KeyRound className="h-4 w-4" />
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-xs font-bold text-white">Audit &amp; Compliance</p>
-                <p className="text-2xs text-slate-400">End-to-end ledger verification tracking</p>
-              </div>
-            </div>
           </div>
         </div>
 
