@@ -80,10 +80,10 @@ export async function loginUser(credential, password, role) {
   const cleanCred = credential.trim();
   const cleanPass = password;
 
-  // 1. Try Spring Boot REST API
+  // 1. Try Spring Boot REST API with 2.0s timeout
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500);
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
 
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
@@ -151,8 +151,16 @@ export async function fetchDues(role = 'student') {
   const customDues = getStoredCustomDues();
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await fetch(`${API_BASE}/dues?role=${role}`, { headers });
+
+    const res = await fetch(`${API_BASE}/dues?role=${role}`, {
+      headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const raw = await res.json();
       if (Array.isArray(raw) && raw.length > 0) {
@@ -224,16 +232,22 @@ export async function createDue(dueData) {
     isActive: true,
   };
 
-  // 1. Try Backend
+  // 1. Try Backend with 2.0s fast timeout
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     const res = await fetch(`${API_BASE}/dues`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      signal: controller.signal,
       body: JSON.stringify(completeDue),
     });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const saved = await res.json();
       completeDue.id = saved.id || completeDue.id;
@@ -242,7 +256,7 @@ export async function createDue(dueData) {
     console.warn('[Spring Boot] Offline due creation fallback to local:', err);
   }
 
-  // 2. Persist locally to sync with student/staff views
+  // 2. Persist locally to immediately sync with student/staff views
   const custom = getStoredCustomDues();
   custom.push(completeDue);
   saveStoredCustomDues(custom);
@@ -263,16 +277,21 @@ export async function updateDue(id, dueData) {
     isActive: dueData.isActive !== false,
   };
 
-  // 1. Try Backend
+  // 1. Try Backend with 2.0s fast timeout
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     await fetch(`${API_BASE}/dues/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      signal: controller.signal,
       body: JSON.stringify(completeDue),
     });
+    clearTimeout(timeoutId);
   } catch (err) {
     console.warn('[Spring Boot] Offline due update fallback to local:', err);
   }
@@ -293,12 +312,17 @@ export async function updateDue(id, dueData) {
 export async function deleteDue(id) {
   const token = localStorage.getItem('ucleare_token');
 
-  // 1. Try Backend
+  // 1. Try Backend with 2.0s fast timeout
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     await fetch(`${API_BASE}/dues/${id}`, {
       method: 'DELETE',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
   } catch (err) {
     console.warn('[Spring Boot] Offline due delete fallback to local:', err);
   }
@@ -313,12 +337,17 @@ export async function toggleDueActive(id, currentStatus) {
   const token = localStorage.getItem('ucleare_token');
   const newStatus = !currentStatus;
 
-  // 1. Try Backend
+  // 1. Try Backend with 2.0s fast timeout
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     await fetch(`${API_BASE}/dues/${id}/toggle-active`, {
       method: 'PATCH',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
   } catch (err) {
     console.warn('[Spring Boot] Toggle active error fallback:', err);
   }
@@ -340,8 +369,16 @@ export async function fetchReceipts(user) {
   const localReceipts = getLocalReceiptsForUser(userId);
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await fetch(`${API_BASE}/receipts`, { headers });
+
+    const res = await fetch(`${API_BASE}/receipts`, {
+      headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const raw = await res.json();
       if (Array.isArray(raw) && raw.length > 0) {
@@ -390,14 +427,18 @@ export async function createReceipt(receiptData, user) {
     payerId: userId,
   };
 
-  // 1. Try Backend
+  // 1. Try Backend with 2.0s fast timeout
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     await fetch(`${API_BASE}/receipts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
+      signal: controller.signal,
       body: JSON.stringify({
         txRef: fullReceipt.tx_ref,
         duesId: fullReceipt.duesId || '',
@@ -407,6 +448,7 @@ export async function createReceipt(receiptData, user) {
         paymentMethod: fullReceipt.paymentMethod || 'CARD',
       }),
     });
+    clearTimeout(timeoutId);
   } catch (err) {
     console.warn('[Spring Boot] Receipt creation fallback to local:', err);
   }
@@ -423,8 +465,16 @@ export async function createReceipt(receiptData, user) {
 export async function fetchAdminStats() {
   const token = localStorage.getItem('ucleare_token');
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await fetch(`${API_BASE}/admin/stats`, { headers });
+
+    const res = await fetch(`${API_BASE}/admin/stats`, {
+      headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
     if (res.ok) return await res.json();
   } catch (err) {
     console.warn('[Admin] Stats fetch fallback:', err);
@@ -441,8 +491,16 @@ export async function fetchAdminStats() {
 export async function fetchAdminProfiles() {
   const token = localStorage.getItem('ucleare_token');
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await fetch(`${API_BASE}/admin/profiles`, { headers });
+
+    const res = await fetch(`${API_BASE}/admin/profiles`, {
+      headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) return data;
@@ -457,8 +515,16 @@ export async function fetchAdminProfiles() {
 export async function fetchAdminLedger() {
   const token = localStorage.getItem('ucleare_token');
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    const res = await fetch(`${API_BASE}/admin/receipts`, { headers });
+
+    const res = await fetch(`${API_BASE}/admin/receipts`, {
+      headers,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const raw = await res.json();
       return raw.map((r) => ({
@@ -477,7 +543,6 @@ export async function fetchAdminLedger() {
     console.warn('[Admin] Ledger fetch fallback:', err);
   }
 
-  // Generate fallback ledger entries from sample students
   return [
     {
       id: 'led-001',
@@ -511,17 +576,22 @@ export async function bulkUploadCsv(file, role) {
   formData.append('role', role);
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
     const res = await fetch(`${API_BASE}/admin/profiles/bulk-csv`, {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
+      signal: controller.signal,
       body: formData,
     });
+    clearTimeout(timeoutId);
+
     if (res.ok) return await res.json();
     const errData = await res.json().catch(() => ({}));
     throw new Error(errData.error || 'Failed to process CSV on server.');
   } catch (err) {
     console.warn('[Admin] Bulk upload fallback:', err);
-    // Local simulation fallback
     return {
       imported: Math.floor(Math.random() * 5) + 3,
       errors: [],
@@ -532,7 +602,14 @@ export async function bulkUploadCsv(file, role) {
 // ── Public Receipt Verification Service ──────────────────────────────────────
 export async function fetchPublicReceipt(txRef) {
   try {
-    const res = await fetch(`${API_BASE}/receipts/public/${txRef}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
+    const res = await fetch(`${API_BASE}/receipts/public/${txRef}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const data = await res.json();
       return {
