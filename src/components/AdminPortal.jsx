@@ -778,7 +778,7 @@ export default function AdminPortal({ initialTab = 'overview' }) {
                               className="btn-secondary h-7 text-2xs px-3 gap-1.5 font-semibold inline-flex items-center"
                             >
                               <Eye className="h-3.5 w-3.5 text-brand-orange" />
-                              View Clearance
+                              View Payments
                             </button>
                           </td>
                         </tr>
