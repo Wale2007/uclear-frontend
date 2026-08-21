@@ -34,6 +34,8 @@ import {
   Eye,
   EyeOff,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   Info,
 } from 'lucide-react';
@@ -94,12 +96,16 @@ export default function AdminPortal({ initialTab = 'overview' }) {
   const [allReceipts, setAllReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Registry Filters
+  // Registry Filters & Pagination
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [registryPage, setRegistryPage] = useState(1);
+  const [registryPageSize, setRegistryPageSize] = useState(5);
 
-  // Ledger Search
+  // Ledger Search & Pagination
   const [ledgerSearch, setLedgerSearch] = useState('');
+  const [ledgerPage, setLedgerPage] = useState(1);
+  const [ledgerPageSize, setLedgerPageSize] = useState(5);
 
   // Bulk Upload
   const [uploadRole, setUploadRole] = useState('student');
@@ -325,6 +331,12 @@ export default function AdminPortal({ initialTab = 'overview' }) {
     return matchRole && matchSearch;
   });
 
+  const totalRegistryPages = Math.ceil(filteredProfiles.length / registryPageSize) || 1;
+  const paginatedProfiles = filteredProfiles.slice(
+    (registryPage - 1) * registryPageSize,
+    registryPage * registryPageSize
+  );
+
   // Filtered Receipts
   const filteredReceipts = allReceipts.filter((r) => {
     const term = ledgerSearch.toLowerCase();
@@ -335,6 +347,12 @@ export default function AdminPortal({ initialTab = 'overview' }) {
       r.duesName?.toLowerCase().includes(term)
     );
   });
+
+  const totalLedgerPages = Math.ceil(filteredReceipts.length / ledgerPageSize) || 1;
+  const paginatedReceipts = filteredReceipts.slice(
+    (ledgerPage - 1) * ledgerPageSize,
+    ledgerPage * ledgerPageSize
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col antialiased">
@@ -758,33 +776,91 @@ export default function AdminPortal({ initialTab = 'overview' }) {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {filteredProfiles.map((p) => (
-                        <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="table-td font-bold text-slate-900">{p.name}</td>
-                          <td className="table-td">
-                            <span className={`badge-${p.role === 'student' ? 'neutral' : 'warning'} text-2xs uppercase`}>
-                              {p.role}
-                            </span>
-                          </td>
-                          <td className="table-td font-mono font-semibold">{p.matricNo || p.staffId || '—'}</td>
-                          <td className="table-td text-slate-500">{p.email}</td>
-                          <td className="table-td text-slate-600">{p.department || 'General'}</td>
-                          <td className="table-td text-right">
-                            <button
-                              onClick={() => {
-                                setInspectUser(p);
-                                setUserStandingFilter('all');
-                              }}
-                              className="btn-secondary h-7 text-2xs px-3 gap-1.5 font-semibold inline-flex items-center"
-                            >
-                              <Eye className="h-3.5 w-3.5 text-brand-orange" />
-                              View Payments
-                            </button>
+                      {paginatedProfiles.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="text-center py-8 text-slate-400 font-medium">
+                            No enrolled members found matching your search criteria.
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        paginatedProfiles.map((p) => (
+                          <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="table-td font-bold text-slate-900">{p.name}</td>
+                            <td className="table-td">
+                              <span className={`badge-${p.role === 'student' ? 'neutral' : 'warning'} text-2xs uppercase`}>
+                                {p.role}
+                              </span>
+                            </td>
+                            <td className="table-td font-mono font-semibold">{p.matricNo || p.staffId || '—'}</td>
+                            <td className="table-td text-slate-500">{p.email}</td>
+                            <td className="table-td text-slate-600">{p.department || 'General'}</td>
+                            <td className="table-td text-right">
+                              <button
+                                onClick={() => {
+                                  setInspectUser(p);
+                                  setUserStandingFilter('all');
+                                }}
+                                className="btn-secondary h-7 text-2xs px-3 gap-1.5 font-semibold inline-flex items-center"
+                              >
+                                <Eye className="h-3.5 w-3.5 text-brand-orange" />
+                                View Payments
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Registry Pagination Bar */}
+                <div className="p-3.5 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <span>
+                      Showing {filteredProfiles.length > 0 ? (registryPage - 1) * registryPageSize + 1 : 0} to{' '}
+                      {Math.min(registryPage * registryPageSize, filteredProfiles.length)} of {filteredProfiles.length} members
+                    </span>
+                    <span className="text-slate-300">|</span>
+                    <span className="text-slate-400">Show:</span>
+                    {[5, 10, 20].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => {
+                          setRegistryPageSize(size);
+                          setRegistryPage(1);
+                        }}
+                        className={`px-2 py-0.5 rounded font-semibold text-2xs transition-colors ${
+                          registryPageSize === size
+                            ? 'bg-brand-orange text-white shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setRegistryPage((p) => Math.max(1, p - 1))}
+                      disabled={registryPage === 1}
+                      className="btn-secondary h-8 px-2.5 text-xs gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="h-3.5 w-3.5" />
+                      Previous
+                    </button>
+                    <span className="px-2 font-mono text-2xs font-semibold text-slate-700">
+                      Page {registryPage} of {totalRegistryPages}
+                    </span>
+                    <button
+                      onClick={() => setRegistryPage((p) => Math.min(totalRegistryPages, p + 1))}
+                      disabled={registryPage === totalRegistryPages}
+                      className="btn-secondary h-8 px-2.5 text-xs gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -832,28 +908,86 @@ export default function AdminPortal({ initialTab = 'overview' }) {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {filteredReceipts.map((r) => (
-                        <tr key={r.id || r.txRef} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="table-td font-mono font-bold text-brand-orange">{r.txRef}</td>
-                          <td className="table-td font-semibold text-slate-900">{r.payerName}</td>
-                          <td className="table-td font-mono font-semibold">{r.payerId}</td>
-                          <td className="table-td text-slate-700">{r.duesName}</td>
-                          <td className="table-td text-right font-bold text-slate-900">
-                            ₦{Number(r.amount).toLocaleString()}
-                          </td>
-                          <td className="table-td text-right text-slate-400">
-                            {r.createdAt
-                              ? new Date(r.createdAt).toLocaleDateString('en-NG', {
-                                  day: 'numeric',
-                                  month: 'short',
-                                  year: 'numeric',
-                                })
-                              : 'Cleared'}
+                      {paginatedReceipts.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="text-center py-8 text-slate-400 font-medium">
+                            No ledger transactions found matching your search.
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        paginatedReceipts.map((r) => (
+                          <tr key={r.id || r.txRef} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="table-td font-mono font-bold text-brand-orange">{r.txRef}</td>
+                            <td className="table-td font-semibold text-slate-900">{r.payerName}</td>
+                            <td className="table-td font-mono font-semibold">{r.payerId}</td>
+                            <td className="table-td text-slate-700">{r.duesName}</td>
+                            <td className="table-td text-right font-bold text-slate-900">
+                              ₦{Number(r.amount).toLocaleString()}
+                            </td>
+                            <td className="table-td text-right text-slate-400">
+                              {r.createdAt
+                                ? new Date(r.createdAt).toLocaleDateString('en-NG', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                  })
+                                : 'Cleared'}
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Ledger Pagination Bar */}
+                <div className="p-3.5 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <span>
+                      Showing {filteredReceipts.length > 0 ? (ledgerPage - 1) * ledgerPageSize + 1 : 0} to{' '}
+                      {Math.min(ledgerPage * ledgerPageSize, filteredReceipts.length)} of {filteredReceipts.length} records
+                    </span>
+                    <span className="text-slate-300">|</span>
+                    <span className="text-slate-400">Show:</span>
+                    {[5, 10, 20].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => {
+                          setLedgerPageSize(size);
+                          setLedgerPage(1);
+                        }}
+                        className={`px-2 py-0.5 rounded font-semibold text-2xs transition-colors ${
+                          ledgerPageSize === size
+                            ? 'bg-brand-teal text-white shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setLedgerPage((p) => Math.max(1, p - 1))}
+                      disabled={ledgerPage === 1}
+                      className="btn-secondary h-8 px-2.5 text-xs gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="h-3.5 w-3.5" />
+                      Previous
+                    </button>
+                    <span className="px-2 font-mono text-2xs font-semibold text-slate-700">
+                      Page {ledgerPage} of {totalLedgerPages}
+                    </span>
+                    <button
+                      onClick={() => setLedgerPage((p) => Math.min(totalLedgerPages, p + 1))}
+                      disabled={ledgerPage === totalLedgerPages}
+                      className="btn-secondary h-8 px-2.5 text-xs gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
