@@ -58,29 +58,35 @@ function TransactionRow({ receipt, onView }) {
   );
 }
 
-export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavigate }) {
+export default function Dashboard({ user = {}, dues = [], receipts = [], onViewReceipt, onNavigate }) {
   const isReceiptForDue = (r, d) => (
-    (r.duesName && d.name && r.duesName.trim().toLowerCase() === d.name.trim().toLowerCase()) ||
-    r.duesId === d.id ||
-    r.dues_id === d.id
+    (r?.duesName && d?.name && r.duesName.trim().toLowerCase() === d.name.trim().toLowerCase()) ||
+    (r?.duesId && d?.id && r.duesId === d.id) ||
+    (r?.dues_id && d?.id && r.dues_id === d.id)
   );
 
-  const totalPaid    = receipts.reduce((s, r) => s + (r.amount || 0), 0);
-  const paidDues     = dues.filter(d => receipts.some(r => isReceiptForDue(r, d)));
-  const pendingDues  = dues.filter(d => !receipts.some(r => isReceiptForDue(r, d)));
-  const totalPending = pendingDues.reduce((s, d) => s + (d.amount || 0), 0);
+  const duesList = Array.isArray(dues) ? dues : [];
+  const receiptsList = Array.isArray(receipts) ? receipts : [];
+
+  const totalPaid    = receiptsList.reduce((s, r) => s + (Number(r?.amount) || 0), 0);
+  const paidDues     = duesList.filter(d => receiptsList.some(r => isReceiptForDue(r, d)));
+  const pendingDues  = duesList.filter(d => !receiptsList.some(r => isReceiptForDue(r, d)));
+  const totalPending = pendingDues.reduce((s, d) => s + (Number(d?.amount) || 0), 0);
   const today = new Date();
   today.setHours(0,0,0,0);
-  const overdueDues  = pendingDues.filter(d => d.isOverdue || (d.deadline && new Date(d.deadline) < today));
-  const pct          = dues.length ? Math.round((paidDues.length / dues.length) * 100) : 0;
+  const overdueDues  = pendingDues.filter(d => d?.isOverdue || (d?.deadline && new Date(d.deadline) < today));
+  const pct          = duesList.length ? Math.round((paidDues.length / duesList.length) * 100) : 0;
 
-  const recentReceipts = [...receipts]
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
+  const recentReceipts = [...receiptsList]
+    .sort((a, b) => new Date(b?.date || 0) - new Date(a?.date || 0))
     .slice(0, 5);
 
   const r     = 38;
   const circ  = 2 * Math.PI * r;
   const offset = circ - (pct / 100) * circ;
+
+  const userName = user?.name || 'User';
+  const firstName = userName.split(' ')[0] || 'User';
 
   return (
     <div className="space-y-6 animate-fade-in" style={{ animationDuration: '0.3s' }}>
@@ -92,12 +98,12 @@ export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavig
             FUTA &middot; Academic Session 2025/2026
           </p>
           <h1 className="text-xl font-bold tracking-tight text-slate-900 mt-1">
-            Welcome back, {user.name.split(' ')[0]}
+            Welcome back, {firstName}
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            {user.role === 'student'
-              ? `${user.level}  -  ${user.department}`
-              : `${user.title || 'Staff Member'}  -  ${user.department}`
+            {user?.role === 'student'
+              ? `${user?.level || 'Student'}  -  ${user?.department || 'FUTA'}`
+              : `${user?.title || 'Staff Member'}  -  ${user?.department || 'FUTA'}`
             }
           </p>
         </div>
@@ -108,7 +114,7 @@ export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavig
             </span>
           )}
           <button
-            onClick={() => onNavigate('dues')}
+            onClick={() => onNavigate && onNavigate('dues')}
             className="btn-primary text-xs h-9 px-3.5"
           >
             Pay Outstanding Dues
