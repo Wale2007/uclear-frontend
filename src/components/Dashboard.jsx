@@ -12,14 +12,14 @@ import {
 
 function StatCard({ label, value, sub, icon: Icon, accentColor }) {
   return (
-    <div className="card-premium p-6 flex flex-col justify-between h-36">
+    <div className="stat-card animate-slide-up">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <p className="text-2xs font-semibold uppercase tracking-wider text-slate-400">{label}</p>
           <p className="text-2xl font-bold tracking-tight text-slate-900">{value}</p>
         </div>
         <div
-          className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          className="h-9 w-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
           style={{ background: `${accentColor}15`, color: accentColor }}
         >
           <Icon className="h-5 w-5" strokeWidth={1.5} />
@@ -32,8 +32,8 @@ function StatCard({ label, value, sub, icon: Icon, accentColor }) {
 
 function TransactionRow({ receipt, onView }) {
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-0">
-      <div className="h-8 w-8 flex-shrink-0 rounded-lg bg-brand-orange/10 flex items-center justify-center text-brand-orange">
+    <div className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-0 rounded-lg px-2 -mx-2 transition-all duration-150 hover:bg-slate-50 group">
+      <div className="h-8 w-8 flex-shrink-0 rounded-lg bg-brand-orange/10 flex items-center justify-center text-brand-orange transition-transform duration-200 group-hover:scale-110">
         <CircleDollarSign className="h-4 w-4" strokeWidth={1.5} />
       </div>
       <div className="min-w-0 flex-1">
@@ -50,7 +50,7 @@ function TransactionRow({ receipt, onView }) {
       </div>
       <button
         onClick={() => onView(receipt)}
-        className="btn-secondary h-7 px-2.5 text-2xs font-semibold"
+        className="btn-secondary h-7 px-2.5 text-2xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150"
       >
         View
       </button>
@@ -83,7 +83,7 @@ export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavig
   const offset = circ - (pct / 100) * circ;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in" style={{ animationDuration: '0.3s' }}>
 
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
@@ -118,7 +118,7 @@ export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavig
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 stagger-children">
         <StatCard
           label="Total Cleared"
           value={`\u20A6${totalPaid.toLocaleString()}`}
@@ -173,7 +173,7 @@ export default function Dashboard({ user, dues, receipts, onViewReceipt, onNavig
             </div>
             <button
               onClick={() => onNavigate('receipts')}
-              className="text-xs font-semibold text-brand-orange hover:underline"
+              className="text-xs font-semibold text-brand-orange link-slide"
             >
               Full History
             </button>
