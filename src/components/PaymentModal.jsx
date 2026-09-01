@@ -13,13 +13,24 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
   const flwPublicKey = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || settings?.publicKey || 'FLWPUBK_TEST-d024d9409d82dc750045a43347fe46c2-X';
   const useLiveGateway = true;
 
+  // Cleanup helper to automatically remove Flutterwave DOM overlay
+  const removeFlutterwaveDOM = () => {
+    try {
+      const flwElements = document.querySelectorAll(
+        'iframe[src*="flutterwave"], iframe[name="checkout"], .flw-overlay, #flwpugapiname, [id*="flw"], div[style*="z-index: 2147483647"]'
+      );
+      flwElements.forEach((el) => el.remove());
+      document.body.style.overflow = 'auto';
+    } catch (ignored) {}
+  };
+
   useEffect(() => {
     if (isOpen && due) {
       const timer = setTimeout(() => {
         if (window.FlutterwaveCheckout) {
           triggerFlutterwaveSDK();
         }
-      }, 300);
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -33,6 +44,15 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
     }
 
     const txRef = `EDUES-${user?.matricNo || user?.staffId || 'USR'}-${Date.now()}`;
+
+    // Listen for payment postMessage events from Flutterwave iframe to auto-close
+    const messageListener = (event) => {
+      if (event?.data?.status === 'successful' || event?.data?.resp?.status === 'successful') {
+        window.removeEventListener('message', messageListener);
+        setTimeout(removeFlutterwaveDOM, 1000);
+      }
+    };
+    window.addEventListener('message', messageListener);
 
     window.FlutterwaveCheckout({
       public_key: flwPublicKey,
@@ -51,6 +71,8 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
         logo: 'https://res.cloudinary.com/flutterwave/image/upload/v1595492543/flutterwave-logo-colored.svg',
       },
       callback: function (data) {
+        window.removeEventListener('message', messageListener);
+
         if (data.status === 'successful' || data.status === 'completed' || data.tx_ref) {
           const newReceipt = {
             id: data.transaction_id || Date.now(),
@@ -65,11 +87,18 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
             payerName: user?.name,
             payerId: user?.matricNo || user?.staffId,
           };
-          onPaymentSuccess(newReceipt);
-          onClose();
+
+          // Automatically clear Flutterwave modal after brief confirmation and transition immediately to receipt
+          setTimeout(() => {
+            removeFlutterwaveDOM();
+            onPaymentSuccess(newReceipt);
+            onClose();
+          }, 800);
         }
       },
       onclose: function () {
+        window.removeEventListener('message', messageListener);
+        removeFlutterwaveDOM();
         onClose();
       },
     });
@@ -99,8 +128,8 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
         });
         setSuccessAnimation(false);
         onClose();
-      }, 1500);
-    }, 1800);
+      }, 1000);
+    }, 1200);
   };
 
   if (!isOpen || !due) return null;
@@ -160,155 +189,144 @@ export default function PaymentModal({ isOpen, onClose, due, user, settings, onP
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-500 border border-emerald-200/40">
               <CheckCircle2 className="h-7 w-7" strokeWidth={1.5} />
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">Payment Successful</h3>
-            <p className="text-xs text-slate-400">Generating digital e-receipt record...</p>
+            <h3 className="text-base font-bold text-slate-900">Payment Confirmed</h3>
+            <p className="mt-1 text-xs text-slate-500 max-w-xs">Generating your official clearance receipt...</p>
           </div>
         )}
 
-        <div className="px-6 py-4 flex items-center justify-between border-b border-slate-100">
+        <div className="flex items-center justify-between border-b border-slate-100 p-4">
           <div>
-            <p className="text-2xs font-bold uppercase tracking-wider text-slate-400">Demo Checkout</p>
-            <p className="text-sm font-semibold text-slate-800 mt-0.5">{due.name}</p>
+            <span className="text-2xs font-bold uppercase tracking-wider text-slate-400">Payment Checkout</span>
+            <h3 className="text-sm font-bold text-slate-900 truncate max-w-xs">{due.name}</h3>
           </div>
-          <button onClick={onClose} disabled={isProcessing} className="h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 transition-colors disabled:opacity-40">
+          <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-50 hover:text-slate-600">
             <X className="h-4 w-4" strokeWidth={1.5} />
           </button>
         </div>
 
-        <div className="px-6 py-4 bg-slate-50/50 flex items-center justify-between border-b border-slate-100">
-          <div>
-            <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider">Amount Payable</p>
-            <p className="text-xl font-bold text-slate-900 mt-0.5">&#8358;{due.amount.toLocaleString()}</p>
+        <form onSubmit={handleSimulatedPayment} className="p-5 space-y-4">
+          <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 flex items-center justify-between">
+            <div>
+              <p className="text-2xs text-slate-400 font-medium">Payable Amount</p>
+              <p className="text-xl font-extrabold text-slate-900">&#8358;{due.amount.toLocaleString()}</p>
+            </div>
+            <span className="badge-neutral text-2xs font-mono font-semibold">{due.category}</span>
           </div>
-          <div className="text-right">
-            <p className="text-2xs font-semibold text-slate-400 uppercase tracking-wider">Payer Account</p>
-            <p className="text-xs font-mono font-semibold text-slate-700 mt-0.5 max-w-[150px] truncate">{user?.email}</p>
+
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { id: 'card', label: 'Card', icon: CreditCard },
+              { id: 'transfer', label: 'Transfer', icon: Landmark },
+              { id: 'ussd', label: 'USSD', icon: Smartphone }
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setPaymentMethod(id)}
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl p-3 border text-xs font-semibold transition-all ${
+                  paymentMethod === id
+                    ? 'border-brand-orange bg-brand-orange/5 text-brand-orange ring-1 ring-brand-orange/20'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <Icon className="h-4 w-4" strokeWidth={1.5} />
+                <span>{label}</span>
+              </button>
+            ))}
           </div>
-        </div>
 
-        <div className="tabs-container m-6 mb-4">
-          {[
-            { id: 'card', label: 'Card Payment' },
-            { id: 'bank', label: 'Bank Transfer' },
-            { id: 'ussd', label: 'USSD Code' },
-          ].map(({ id, label }) => (
-            <button
-              key={id}
-              onClick={() => setPaymentMethod(id)}
-              disabled={isProcessing}
-              className={`tab-btn text-2xs py-1.5 ${paymentMethod === id ? 'active' : ''}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={handleSimulatedPayment} className="px-6 pb-6 space-y-4">
           {paymentMethod === 'card' && (
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="block text-2xs font-bold text-slate-400 uppercase tracking-wider">Card Number</label>
+            <div className="space-y-3 pt-1">
+              <div>
+                <label className="text-2xs font-bold uppercase tracking-wider text-slate-400">Card Number</label>
                 <input
                   type="text"
                   required
-                  placeholder="5531 8412 9012 3456"
-                  maxLength="19"
+                  placeholder="5399 •••• •••• 1234"
                   value={cardNumber}
-                  onChange={(e) => {
-                    const raw = e.target.value.replace(/\D/g, '');
-                    setCardNumber(raw.replace(/(.{4})/g, '$1 ').trim());
-                  }}
-                  disabled={isProcessing}
-                  className="field"
+                  onChange={(e) => setCardNumber(e.target.value)}
+                  className="input-field mt-1 text-xs"
                 />
-                <p className="text-2xs text-slate-400">Test Card: 5531 8412 9012 3456 &middot; Expiry: 12/28 &middot; CVV: 123</p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="block text-2xs font-bold text-slate-400 uppercase tracking-wider">Expiry Date</label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-2xs font-bold uppercase tracking-wider text-slate-400">Expiry Date</label>
                   <input
                     type="text"
                     required
                     placeholder="MM/YY"
-                    maxLength="5"
                     value={cardExpiry}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/\D/g, '');
-                      setCardExpiry(raw.length >= 2 ? `${raw.slice(0,2)}/${raw.slice(2,4)}` : raw);
-                    }}
-                    disabled={isProcessing}
-                    className="field"
+                    onChange={(e) => setCardExpiry(e.target.value)}
+                    className="input-field mt-1 text-xs"
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="block text-2xs font-bold text-slate-400 uppercase tracking-wider">CVV Code</label>
+                <div>
+                  <label className="text-2xs font-bold uppercase tracking-wider text-slate-400">CVV</label>
                   <input
                     type="password"
                     required
+                    maxLength={3}
                     placeholder="123"
-                    maxLength="3"
                     value={cardCvv}
-                    onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
-                    disabled={isProcessing}
-                    className="field"
+                    onChange={(e) => setCardCvv(e.target.value)}
+                    className="input-field mt-1 text-xs"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {paymentMethod === 'bank' && (
-            <div className="space-y-4">
-              <div className="p-3 bg-amber-50 border border-amber-200/40 rounded-lg flex gap-2 text-2xs text-amber-700 font-medium">
-                <AlertCircle className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
-                <span>Transfer exactly &#8358;{due.amount.toLocaleString()} to the test account. Instant ledger confirmation enabled.</span>
+          {paymentMethod === 'transfer' && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-2 text-xs">
+              <p className="text-2xs font-bold uppercase tracking-wider text-slate-400">Bank Transfer Details</p>
+              <div className="flex justify-between font-mono font-bold text-slate-800">
+                <span>Bank:</span>
+                <span>Access Bank PLC</span>
               </div>
-              <div className="p-4 bg-slate-50 border border-slate-100 rounded-lg space-y-2 text-xs font-mono text-slate-700">
-                <div className="flex justify-between"><span>Bank Name:</span><span className="font-semibold text-slate-900">Uclear Settlement Bank</span></div>
-                <div className="flex justify-between"><span>Account Number:</span><span className="font-semibold text-slate-900">9912034958</span></div>
-                <div className="flex justify-between"><span>Beneficiary:</span><span className="font-semibold text-slate-900">FUTA Bursary Account</span></div>
+              <div className="flex justify-between font-mono font-bold text-slate-800">
+                <span>Account No:</span>
+                <span>0123456789</span>
+              </div>
+              <div className="flex justify-between font-mono font-bold text-slate-800">
+                <span>Account Name:</span>
+                <span>FUTA Uclear Bursary</span>
               </div>
             </div>
           )}
 
           {paymentMethod === 'ussd' && (
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="block text-2xs font-bold text-slate-400 uppercase tracking-wider">Select Financial Institution</label>
-                <select
-                  value={ussdSelected}
-                  onChange={(e) => setUssdSelected(e.target.value)}
-                  disabled={isProcessing}
-                  className="field"
-                >
-                  <option>GTBank (*737#)</option>
-                  <option>Access Bank (*901#)</option>
-                  <option>Zenith Bank (*966#)</option>
-                  <option>UBA (*919#)</option>
-                  <option>First Bank (*894#)</option>
-                </select>
-              </div>
-              <div className="p-4 bg-slate-50 border border-slate-100 rounded-lg text-center space-y-1">
-                <p className="text-2xs text-slate-400">Dial string on registered line:</p>
-                <p className="text-lg font-mono font-bold text-brand-orange tracking-wide">
-                  {ussdSelected.match(/\*\d+#/)?.[0] || '*737#'}*000*{due.amount}#
-                </p>
-              </div>
+            <div className="space-y-2 text-xs">
+              <label className="text-2xs font-bold uppercase tracking-wider text-slate-400">Select Bank USSD</label>
+              <select
+                value={ussdSelected}
+                onChange={(e) => setUssdSelected(e.target.value)}
+                className="input-field text-xs font-mono"
+              >
+                <option>GTBank (*737#)</option>
+                <option>Access Bank (*901#)</option>
+                <option>Zenith Bank (*966#)</option>
+                <option>First Bank (*894#)</option>
+                <option>UBA (*919#)</option>
+              </select>
             </div>
           )}
 
-          <div className="flex items-center justify-center gap-1.5 text-2xs text-slate-400 pt-2 border-t border-slate-100">
-            <ShieldCheck className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5} />
-            <span>256-Bit Encrypted Simulation Gateway</span>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isProcessing}
+              className="btn-primary w-full h-10 text-xs font-semibold justify-center shadow-md gap-2"
+            >
+              {isProcessing ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  Processing Secure Payment...
+                </>
+              ) : (
+                `Complete Payment (₦${due.amount.toLocaleString()})`
+              )}
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={isProcessing}
-            className="w-full btn-primary text-sm h-10 mt-1"
-          >
-            {isProcessing ? 'Processing Payment...' : `Complete Payment of \u20A6${due.amount.toLocaleString()}`}
-          </button>
         </form>
       </div>
     </div>
