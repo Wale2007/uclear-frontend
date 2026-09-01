@@ -359,23 +359,24 @@ export default function AdminPortal({ initialTab = 'overview' }) {
       {/* ── Top Header ────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 bg-slate-900 text-white px-4 sm:px-6 h-14 flex items-center justify-between border-b border-slate-800">
         <div className="flex items-center gap-3">
-          <Logo />
-          <span className="hidden sm:inline-block text-2xs font-bold uppercase tracking-wider bg-brand-orange/20 text-brand-orange px-2 py-0.5 rounded border border-brand-orange/30">
-            Institutional Admin
+          <Logo light />
+          <span className="hidden sm:inline-block h-4 w-px bg-slate-700" />
+          <span className="hidden sm:inline-block text-2xs font-semibold text-slate-400 tracking-wide">
+            Admin Portal
           </span>
         </div>
 
         {/* Identity & Logout */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <div className="text-right leading-tight">
-            <p className="text-xs font-bold text-slate-100">{user?.name || 'Administrator'}</p>
-            <p className="text-2xs text-slate-400 font-mono">{user?.department || 'Executive Bursary'}</p>
+            <p className="text-xs font-bold text-white">{user?.name || 'Administrator'}</p>
+            <p className="text-2xs text-slate-400">{user?.department || 'Bursary'}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-slate-800 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors border border-slate-700"
           >
-            <LogOut className="h-4 w-4" strokeWidth={1.5} />
+            <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
             <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
