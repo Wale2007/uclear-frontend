@@ -130,18 +130,19 @@ export async function loginUser(credential, password, role) {
   }
 
   // 2. Fallback to Local Mock Database (Instant)
-  const found = authenticateMockUser(cleanCred, cleanPass, role.toLowerCase());
-  if (!found) {
-    throw new Error('Invalid credentials. Please verify your details and try again.');
+  const mockResult = authenticateMockUser(cleanCred, cleanPass, role.toLowerCase());
+  if (!mockResult || !mockResult.success || !mockResult.user) {
+    throw new Error(mockResult?.error || 'Invalid credentials. Please verify your details and try again.');
   }
 
-  const dummyToken = `mock-jwt-token-${found.id}-${Date.now()}`;
+  const mockUser = mockResult.user;
+  const dummyToken = `mock-jwt-token-${mockUser.id}-${Date.now()}`;
   localStorage.setItem('ucleare_token', dummyToken);
 
   return {
     success: true,
     token: dummyToken,
-    user: found,
+    user: mockUser,
   };
 }
 
@@ -182,14 +183,13 @@ export async function fetchDues(role = 'student') {
   }
 
   // Fallback: Combine base mock dues + custom dues created by admin
+  // MOCK_DUES is now a flat array with roleTarget per entry
+  const allMockDues = Array.isArray(MOCK_DUES) ? MOCK_DUES : [];
   let baseDues = [];
   if (role === 'all' || role === 'admin') {
-    baseDues = [
-      ...MOCK_DUES.student.map((d) => ({ ...d, roleTarget: 'student' })),
-      ...MOCK_DUES.staff.map((d) => ({ ...d, roleTarget: 'staff' })),
-    ];
+    baseDues = allMockDues;
   } else {
-    baseDues = (MOCK_DUES[role] || []).map((d) => ({ ...d, roleTarget: role }));
+    baseDues = allMockDues.filter((d) => d.roleTarget === role || d.roleTarget === 'all');
   }
 
   const relevantCustom = customDues.filter(
