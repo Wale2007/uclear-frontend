@@ -1,375 +1,189 @@
 /**
  * Mock Student & Staff Database
- * Simulates what would be fetched from Firebase Firestore in production.
- * Password for all accounts: "password123" (prototype only)
+ * Contains 150+ diverse Nigerian students and 120+ academic & non-academic staff.
+ * Password for all accounts: "password123"
  */
 
-export const MOCK_STUDENTS = [
-  {
-    id: 'std-uuid-0001',
-    role: 'student',
-    name: 'OLA-SALAWU OLAWALE OLUWASEGUN',
-    email: 'wola77923@gmail.com',
-    phone: '08034567890',
-    matricNo: 'SEN/22/9292',
-    department: 'Software Engineering',
-    faculty: 'Computing',
-    level: '300 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0002',
-    role: 'student',
-    name: 'Chukwuemeka Nwosu',
-    email: 'c.nwosu@futa.edu.ng',
-    phone: '07065432109',
-    matricNo: 'EEE/21/3321',
-    department: 'Electrical Engineering',
-    faculty: 'Engineering',
-    level: '400 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0003',
-    role: 'student',
-    name: 'Fatima Al-Hassan',
-    email: 'f.alhassan@futa.edu.ng',
-    phone: '08112345678',
-    matricNo: 'MEE/23/5012',
-    department: 'Mechanical Engineering',
-    faculty: 'Engineering',
-    level: '200 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0004',
-    role: 'student',
-    name: 'Blessing Okafor',
-    email: 'b.okafor@futa.edu.ng',
-    phone: '09023456789',
-    matricNo: 'CHE/20/2209',
-    department: 'Chemical Engineering',
-    faculty: 'Engineering',
-    level: '500 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0005',
-    role: 'student',
-    name: 'Ibrahim Musa',
-    email: 'i.musa@futa.edu.ng',
-    phone: '08098765432',
-    matricNo: 'PHY/22/4120',
-    department: 'Physics',
-    faculty: 'Science',
-    level: '300 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0006',
-    role: 'student',
-    name: 'Ngozi Adeleke',
-    email: 'n.adeleke@futa.edu.ng',
-    phone: '07011223344',
-    matricNo: 'MTH/21/3890',
-    department: 'Mathematics',
-    faculty: 'Science',
-    level: '400 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0007',
-    role: 'student',
-    name: 'Afolabi Taiwo Adeyemi',
-    email: 'a.adeyemi@futa.edu.ng',
-    phone: '08055678901',
-    matricNo: 'CSC/23/6001',
-    department: 'Computer Science',
-    faculty: 'Computing',
-    level: '200 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0008',
-    role: 'student',
-    name: 'Mercy Chidinma Eze',
-    email: 'm.eze@futa.edu.ng',
-    phone: '09011234567',
-    matricNo: 'BCH/22/4455',
-    department: 'Biochemistry',
-    faculty: 'Science',
-    level: '300 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0009',
-    role: 'student',
-    name: 'Suleiman Yakubu Danjuma',
-    email: 's.danjuma@futa.edu.ng',
-    phone: '07022334455',
-    matricNo: 'CVE/21/3100',
-    department: 'Civil Engineering',
-    faculty: 'Engineering',
-    level: '400 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0010',
-    role: 'student',
-    name: 'Adaeze Nkechi Onyeka',
-    email: 'a.onyeka@futa.edu.ng',
-    phone: '08077889900',
-    matricNo: 'ARC/23/5500',
-    department: 'Architecture',
-    faculty: 'Environmental Technology',
-    level: '200 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0011',
-    role: 'student',
-    name: 'Tunde Babatunde Akinola',
-    email: 't.akinola@futa.edu.ng',
-    phone: '08033445566',
-    matricNo: 'IEE/20/2001',
-    department: 'Industrial Engineering',
-    faculty: 'Engineering',
-    level: '500 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0012',
-    role: 'student',
-    name: 'Hauwa Umar Bello',
-    email: 'h.bello@futa.edu.ng',
-    phone: '07099887766',
-    matricNo: 'CHM/22/4300',
-    department: 'Chemistry',
-    faculty: 'Science',
-    level: '300 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0013',
-    role: 'student',
-    name: 'Emeka Chijioke Obi',
-    email: 'e.obi@futa.edu.ng',
-    phone: '09066778899',
-    matricNo: 'GEO/21/3600',
-    department: 'Geology',
-    faculty: 'Science',
-    level: '400 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0014',
-    role: 'student',
-    name: 'Yetunde Funmilayo Bakare',
-    email: 'y.bakare@futa.edu.ng',
-    phone: '08044556677',
-    matricNo: 'APG/23/5700',
-    department: 'Applied Geophysics',
-    faculty: 'Science',
-    level: '200 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0015',
-    role: 'student',
-    name: 'Chisom Adaora Igwe',
-    email: 'c.igwe@futa.edu.ng',
-    phone: '08155566677',
-    matricNo: 'TPS/22/4800',
-    department: 'Transport Planning',
-    faculty: 'Environmental Technology',
-    level: '300 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0016',
-    role: 'student',
-    name: 'Abdulrahman Salisu Idris',
-    email: 'a.idris@futa.edu.ng',
-    phone: '07033221100',
-    matricNo: 'MIN/20/1900',
-    department: 'Mining Engineering',
-    faculty: 'Engineering',
-    level: '500 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0017',
-    role: 'student',
-    name: 'Oluwakemi Adesanya',
-    email: 'o.adesanya@futa.edu.ng',
-    phone: '09077665544',
-    matricNo: 'MAS/23/5900',
-    department: 'Marine Science & Technology',
-    faculty: 'Science',
-    level: '200 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0018',
-    role: 'student',
-    name: 'Victor Onyekachi Nzegwu',
-    email: 'v.nzegwu@futa.edu.ng',
-    phone: '08088997766',
-    matricNo: 'MTE/21/3200',
-    department: 'Metallurgical Engineering',
-    faculty: 'Engineering',
-    level: '400 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0019',
-    role: 'student',
-    name: 'Amina Sani Garba',
-    email: 'a.garba@futa.edu.ng',
-    phone: '07044332211',
-    matricNo: 'BLD/22/4100',
-    department: 'Building Technology',
-    faculty: 'Environmental Technology',
-    level: '300 Level',
-    password: 'password123',
-  },
-  {
-    id: 'std-uuid-0020',
-    role: 'student',
-    name: 'Olumide Adebayo Ogunleye',
-    email: 'o.ogunleye@futa.edu.ng',
-    phone: '09055443322',
-    matricNo: 'PET/20/1800',
-    department: 'Petroleum Engineering',
-    faculty: 'Engineering',
-    level: '500 Level',
-    password: 'password123',
-  },
+const departments = [
+  { dept: 'Software Engineering', faculty: 'Computing', code: 'SEN' },
+  { dept: 'Computer Science', faculty: 'Computing', code: 'CSC' },
+  { dept: 'Information Technology', faculty: 'Computing', code: 'IFT' },
+  { dept: 'Cyber Security', faculty: 'Computing', code: 'CYS' },
+  { dept: 'Electrical & Electronics Engineering', faculty: 'Engineering', code: 'EEE' },
+  { dept: 'Mechanical Engineering', faculty: 'Engineering', code: 'MEE' },
+  { dept: 'Civil & Environmental Engineering', faculty: 'Engineering', code: 'CVE' },
+  { dept: 'Chemical Engineering', faculty: 'Engineering', code: 'CHE' },
+  { dept: 'Metallurgical & Materials Engineering', faculty: 'Engineering', code: 'MTE' },
+  { dept: 'Mining Engineering', faculty: 'Engineering', code: 'MIN' },
+  { dept: 'Petroleum Engineering', faculty: 'Engineering', code: 'PET' },
+  { dept: 'Agricultural & Environmental Engineering', faculty: 'Engineering', code: 'AGE' },
+  { dept: 'Industrial & Production Engineering', faculty: 'Engineering', code: 'IPE' },
+  { dept: 'Biochemistry', faculty: 'Science', code: 'BCH' },
+  { dept: 'Physics', faculty: 'Science', code: 'PHY' },
+  { dept: 'Mathematics', faculty: 'Science', code: 'MTH' },
+  { dept: 'Chemistry', faculty: 'Science', code: 'CHM' },
+  { dept: 'Microbiology', faculty: 'Science', code: 'MCB' },
+  { dept: 'Geology', faculty: 'Science', code: 'GEO' },
+  { dept: 'Applied Geophysics', faculty: 'Science', code: 'APG' },
+  { dept: 'Statistics', faculty: 'Science', code: 'STA' },
+  { dept: 'Architecture', faculty: 'Environmental Technology', code: 'ARC' },
+  { dept: 'Quantity Surveying', faculty: 'Environmental Technology', code: 'QSV' },
+  { dept: 'Building Technology', faculty: 'Environmental Technology', code: 'BLD' },
+  { dept: 'Estate Management', faculty: 'Environmental Technology', code: 'ESM' },
+  { dept: 'Urban & Regional Planning', faculty: 'Environmental Technology', code: 'URP' },
 ];
 
-export const MOCK_STAFF = [
-  { id: 'stf-uuid-0001', role: 'staff', name: 'PROF S.O SALAWU', title: 'Professor', email: 'sosalawu@futa.edu.ng', phone: '08129038475', staffId: 'FUTA/STF/CS/1092', department: 'Computer Science', faculty: 'Computing', password: 'password123' },
-  { id: 'stf-uuid-0002', role: 'staff', name: 'Dr. Aminu Garba', title: 'Senior Lecturer', email: 'a.garba@futa.edu.ng', phone: '07032198765', staffId: 'FUTA/STF/EE/0881', department: 'Electrical Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0003', role: 'staff', name: 'Mrs. Rachael Idowu', title: 'Lecturer I', email: 'r.idowu@futa.edu.ng', phone: '09087654321', staffId: 'FUTA/STF/MT/0443', department: 'Mathematics', faculty: 'Science', password: 'password123' },
-  { id: 'stf-uuid-0004', role: 'staff', name: 'Dr. Benjamin Okafor', title: 'Associate Prof', email: 'b.okafor@futa.edu.ng', phone: '08011223344', staffId: 'FUTA/STF/CE/0901', department: 'Chemical Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0005', role: 'staff', name: 'Prof. Helen Adeyemi', title: 'Professor', email: 'h.adeyemi@futa.edu.ng', phone: '08022334455', staffId: 'FUTA/STF/BI/0772', department: 'Biochemistry', faculty: 'Science', password: 'password123' },
-  { id: 'stf-uuid-0006', role: 'staff', name: 'Dr. Tunde Bakare', title: 'Senior Lecturer', email: 't.bakare@futa.edu.ng', phone: '07033445566', staffId: 'FUTA/STF/CV/0663', department: 'Civil Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0007', role: 'staff', name: 'Dr. Sarah Ibrahim', title: 'Lecturer I', email: 's.ibrahim@futa.edu.ng', phone: '09044556677', staffId: 'FUTA/STF/AR/0554', department: 'Architecture', faculty: 'Environmental Technology', password: 'password123' },
-  { id: 'stf-uuid-0008', role: 'staff', name: 'Engr. Michael Obi', title: 'Lecturer II', email: 'm.obi@futa.edu.ng', phone: '08155667788', staffId: 'FUTA/STF/IE/0445', department: 'Industrial Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0009', role: 'staff', name: 'Dr. Fatima Umar', title: 'Senior Lecturer', email: 'f.umar@futa.edu.ng', phone: '07066778899', staffId: 'FUTA/STF/CH/0336', department: 'Chemistry', faculty: 'Science', password: 'password123' },
-  { id: 'stf-uuid-0010', role: 'staff', name: 'Prof. Adebayo Ogunleye', title: 'Professor', email: 'a.ogunleye@futa.edu.ng', phone: '08077889900', staffId: 'FUTA/STF/GL/0227', department: 'Geology', faculty: 'Science', password: 'password123' },
-  { id: 'stf-uuid-0011', role: 'staff', name: 'Dr. Ngozi Igwe', title: 'Lecturer I', email: 'n.igwe@futa.edu.ng', phone: '09088990011', staffId: 'FUTA/STF/AP/0118', department: 'Applied Geophysics', faculty: 'Science', password: 'password123' },
-  { id: 'stf-uuid-0012', role: 'staff', name: 'Dr. Abdul Idris', title: 'Senior Lecturer', email: 'a.idris@futa.edu.ng', phone: '08199001122', staffId: 'FUTA/STF/TP/0999', department: 'Transport Planning', faculty: 'Environmental Technology', password: 'password123' },
-  { id: 'stf-uuid-0013', role: 'staff', name: 'Engr. Kemi Adesanya', title: 'Lecturer II', email: 'k.adesanya@futa.edu.ng', phone: '07011002233', staffId: 'FUTA/STF/MI/0888', department: 'Mining Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0014', role: 'staff', name: 'Dr. Victor Nzegwu', title: 'Senior Lecturer', email: 'v.nzegwu@futa.edu.ng', phone: '09022113344', staffId: 'FUTA/STF/MS/0777', department: 'Marine Science & Technology', faculty: 'Science', password: 'password123' },
-  { id: 'stf-uuid-0015', role: 'staff', name: 'Dr. Amina Sani', title: 'Lecturer I', email: 'a.sani@futa.edu.ng', phone: '08133224455', staffId: 'FUTA/STF/BU/0666', department: 'Building Technology', faculty: 'Environmental Technology', password: 'password123' },
-  { id: 'stf-uuid-0016', role: 'staff', name: 'Engr. Olumide Tobi', title: 'Lecturer II', email: 'o.tobi@futa.edu.ng', phone: '07044335566', staffId: 'FUTA/STF/PG/0555', department: 'Petroleum Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0017', role: 'staff', name: 'Dr. Chidinma Eze', title: 'Senior Lecturer', email: 'c.eze@futa.edu.ng', phone: '08055446677', staffId: 'FUTA/STF/ME/0444', department: 'Mechanical Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0018', role: 'staff', name: 'Prof. Yakubu Danjuma', title: 'Professor', email: 'y.danjuma@futa.edu.ng', phone: '09066557788', staffId: 'FUTA/STF/EE/0333', department: 'Electrical Engineering', faculty: 'Engineering', password: 'password123' },
-  { id: 'stf-uuid-0019', role: 'staff', name: 'Dr. Nkechi Onyeka', title: 'Lecturer I', email: 'n.onyeka@futa.edu.ng', phone: '08177668899', staffId: 'FUTA/STF/MT/0222', department: 'Mathematics', faculty: 'Science', password: 'password123' },
-  { id: 'stf-uuid-0020', role: 'staff', name: 'Engr. Babatunde Akinola', title: 'Lecturer II', email: 'b.akinola@futa.edu.ng', phone: '07088779900', staffId: 'FUTA/STF/CS/0111', department: 'Computer Science', faculty: 'Computing', password: 'password123' },
+const levels = ['100 Level', '200 Level', '300 Level', '400 Level', '500 Level'];
+
+const studentFirstNames = [
+  'Olawale', 'Chukwuemeka', 'Fatima', 'Blessing', 'Ibrahim', 'Ngozi', 'Afolabi', 'Mercy',
+  'Suleiman', 'Adaeze', 'Tunde', 'Hauwa', 'Emeka', 'Yetunde', 'Chisom', 'Abdulrahman',
+  'Oluwakemi', 'Victor', 'Amina', 'Olumide', 'Samuel', 'Grace', 'David', 'Joy', 'Emmanuel',
+  'Precious', 'Daniel', 'Faith', 'Michael', 'Esther', 'Joshua', 'Ruth', 'Timothy', 'Deborah',
+  'Gabriel', 'Mary', 'Solomon', 'Hannah', 'Paul', 'Miracle', 'Peter', 'Dorcas', 'Joseph',
+  'Khadijah', 'Usman', 'Zainab', 'Aliyu', 'Mariam', 'Mustapha', 'Halima', 'Kabir', 'Bilkisu',
+  'Ayomide', 'Boluwatife', 'Damilola', 'Eniola', 'Fiyinfoluwa', 'Gbenga', 'Kehinde', 'Taiwo'
 ];
 
-/**
- * Dues catalog per role type.
- * In production, this comes from Firebase Firestore `dues` collection.
- */
-export const MOCK_DUES = {
-  student: [
+const studentLastNames = [
+  'OLA-SALAWU', 'Nwosu', 'Al-Hassan', 'Okafor', 'Musa', 'Adeleke', 'Adeyemi', 'Eze',
+  'Danjuma', 'Onyeka', 'Akinola', 'Bello', 'Obi', 'Bakare', 'Igwe', 'Idris',
+  'Adesanya', 'Nzegwu', 'Garba', 'Ogunleye', 'Balogun', 'Oladipo', 'Chukwuma', 'Abubakar',
+  'Olawale', 'Ojo', 'Akintola', 'Okeke', 'Lawal', 'Momoh', 'Ajayi', 'Babangida',
+  'Bamidele', 'Ekwueme', 'Fashola', 'Gbadamosi', 'Haruna', 'Ige', 'Jubril', 'Kalu',
+  'Mustapha', 'Nnamani', 'Ogedengbe', 'Popoola', 'Quadri', 'Raji', 'Sanusi', 'Tijani',
+  'Umar', 'Williams', 'Yusuf', 'Zakariya', 'Alabi', 'Adebisi', 'Fadairo', 'Olatunji'
+];
+
+function generateStudents() {
+  const list = [
     {
-      id: 'dues-std-001',
-      name: 'Student Union Government (SUG) Dues',
-      category: 'Student Union',
-      amount: 2000,
-      description: 'Annual SUG developmental levy, welfare, and membership fee covering all student activities.',
-      deadline: '2026-08-31',
-      isOverdue: false,
-    },
+      id: 'std-uuid-0001',
+      role: 'student',
+      name: 'OLA-SALAWU OLAWALE OLUWASEGUN',
+      email: 'wola77923@gmail.com',
+      phone: '08034567890',
+      matricNo: 'SEN/22/9292',
+      department: 'Software Engineering',
+      faculty: 'Computing',
+      level: '300 Level',
+      password: 'password123',
+    }
+  ];
+
+  let count = 1;
+  const target = 150;
+
+  for (let i = 0; i < studentFirstNames.length && count < target; i++) {
+    for (let j = 0; j < studentLastNames.length && count < target; j++) {
+      const first = studentFirstNames[i];
+      const last = studentLastNames[j];
+      const name = `${last} ${first}`;
+      const deptInfo = departments[(i * 7 + j) % departments.length];
+      const level = levels[(i + j) % levels.length];
+      const year = 20 + ((i + j) % 5);
+      const serial = 1000 + ((i * 37 + j * 13) % 8999);
+      const matricNo = `${deptInfo.code}/${year}/${serial}`;
+      const email = `${first.toLowerCase()}.${last.toLowerCase().replace(/[^a-z0-9]/g, '')}${serial}@futa.edu.ng`;
+      const phone = `080${String((i * 99991 + j * 77773 + serial * 11) % 100000000).padStart(8, '0')}`;
+
+      if (!list.some(s => s.matricNo === matricNo || s.email === email)) {
+        list.push({
+          id: `std-uuid-${String(count + 1).padStart(4, '0')}`,
+          role: 'student',
+          name,
+          email,
+          phone,
+          matricNo,
+          department: deptInfo.dept,
+          faculty: deptInfo.faculty,
+          level,
+          password: 'password123',
+        });
+        count++;
+      }
+    }
+  }
+
+  return list;
+}
+
+export const MOCK_STUDENTS = generateStudents();
+
+const staffTitles = [
+  'Professor', 'Prof.', 'Dr.', 'Dr. (Mrs.)', 'Engr. (Dr.)', 'Associate Prof.',
+  'Senior Lecturer', 'Lecturer I', 'Lecturer II', 'Assistant Lecturer'
+];
+
+const staffFirstNames = [
+  'Sunday', 'Aminu', 'Rachael', 'Benjamin', 'Helen', 'Tunde', 'Sarah', 'Michael',
+  'Fatima', 'Adebayo', 'Ngozi', 'Abdul', 'Kemi', 'Victor', 'Amina', 'Olumide',
+  'Chidinma', 'Yakubu', 'Nkechi', 'Babatunde', 'Solomon', 'Christopher', 'Folashade',
+  'Ikechukwu', 'Korede', 'Mansur', 'Ndidi', 'Olayinka', 'Priscilla', 'Rasheed',
+  'Stella', 'Titus', 'Uche', 'Wasiu', 'Yemi', 'Zubairu', 'Adeola', 'Bukola'
+];
+
+const staffLastNames = [
+  'SALAWU', 'Garba', 'Idowu', 'Okafor', 'Adeyemi', 'Bakare', 'Ibrahim', 'Obi',
+  'Umar', 'Ogunleye', 'Igwe', 'Idris', 'Adesanya', 'Nzegwu', 'Sani', 'Tobi',
+  'Eze', 'Danjuma', 'Onyeka', 'Akinola', 'Akande', 'Babalola', 'Chukwu', 'Daramola',
+  'Falola', 'Giwa', 'Hassan', 'Ikpeba', 'Jegede', 'Kolade', 'Madueke', 'Nwadike',
+  'Ogundele', 'Peters', 'Rotimi', 'Soyinka', 'Taiwo', 'Ukpong', 'Williams', 'Yusuf'
+];
+
+function generateStaff() {
+  const list = [
     {
-      id: 'dues-std-002',
-      name: 'Faculty Developmental Levy',
-      category: 'Faculty',
-      amount: 3500,
-      description: 'Faculty-level operational fees, seminar series, and newsletter publications.',
-      deadline: '2026-09-15',
-      isOverdue: false,
-    },
-    {
-      id: 'dues-std-003',
-      name: 'Departmental Dues',
-      category: 'Departmental',
-      amount: 5000,
-      description: 'Departmental laboratory maintenance, final year project seed fund, and industrial liaison fees.',
-      deadline: '2026-06-25',
-      isOverdue: true,
-    },
-    {
-      id: 'dues-std-004',
-      name: 'Library Clearance & E-Resource Fee',
-      category: 'Other',
-      amount: 1500,
-      description: 'Annual library card renewal, JSTOR/Elsevier digital journal access, and clearance endorsement.',
-      deadline: '2026-09-30',
-      isOverdue: false,
-    },
-    {
-      id: 'dues-std-005',
-      name: 'Sports & Recreation Levy',
-      category: 'Other',
-      amount: 1000,
-      description: 'Covers inter-faculty sports competitions, gym maintenance, and end-of-session cultural fiesta.',
-      deadline: '2026-10-15',
-      isOverdue: false,
-    },
-    {
-      id: 'dues-std-006',
-      name: 'Medical / Health Insurance Levy',
-      category: 'Other',
-      amount: 2500,
-      description: 'Mandatory institutional health insurance contribution for access to student clinic services.',
-      deadline: '2026-07-01',
-      isOverdue: true,
-    },
-  ],
-  staff: [
-    {
-      id: 'dues-stf-001',
-      name: 'ASUU Union Monthly Dues',
-      category: 'Staff Union',
-      amount: 5000,
-      description: 'Academic Staff Union of Universities standard membership and welfare levy.',
-      deadline: '2026-08-31',
-      isOverdue: false,
-    },
-    {
-      id: 'dues-stf-002',
-      name: 'Staff Welfare & Cooperative Fund',
-      category: 'Staff Union',
-      amount: 3000,
-      description: 'Monthly contribution to the staff cooperative society welfare and emergency fund.',
-      deadline: '2026-09-15',
-      isOverdue: false,
-    },
-    {
-      id: 'dues-stf-003',
-      name: 'Staff Club Annual Membership',
-      category: 'Other',
-      amount: 2500,
-      description: 'Optional senior staff quarters recreation club renewal and gymnasium access.',
-      deadline: '2026-06-30',
-      isOverdue: true,
-    },
-    {
-      id: 'dues-stf-004',
-      name: 'NASU Non-Academic Staff Levy',
-      category: 'Staff Union',
-      amount: 2000,
-      description: 'Non-Academic Staff Union of Universities dues for technical and administrative staff.',
-      deadline: '2026-10-01',
-      isOverdue: false,
-    },
-  ],
-};
+      id: 'stf-uuid-0001',
+      role: 'staff',
+      name: 'PROF S.O SALAWU',
+      title: 'Professor',
+      email: 'sosalawu@futa.edu.ng',
+      phone: '08129038475',
+      staffId: 'FUTA/STF/CS/1092',
+      department: 'Computer Science',
+      faculty: 'Computing',
+      password: 'password123',
+    }
+  ];
+
+  let count = 1;
+  const target = 120;
+
+  for (let i = 0; i < staffFirstNames.length && count < target; i++) {
+    for (let j = 0; j < staffLastNames.length && count < target; j++) {
+      const first = staffFirstNames[i];
+      const last = staffLastNames[j];
+      const title = staffTitles[(i * 3 + j) % staffTitles.length];
+      const name = `${title} ${first} ${last}`;
+      const deptInfo = departments[(i * 5 + j) % departments.length];
+      const serial = 100 + ((i * 29 + j * 17) % 900);
+      const staffId = `FUTA/STF/${deptInfo.code}/${serial}`;
+      const email = `${first.toLowerCase().charAt(0)}.${last.toLowerCase().replace(/[^a-z0-9]/g, '')}${serial}@futa.edu.ng`;
+      const phone = `070${String((i * 88883 + j * 66661 + serial * 17) % 100000000).padStart(8, '0')}`;
+
+      if (!list.some(st => st.staffId === staffId || st.email === email)) {
+        list.push({
+          id: `stf-uuid-${String(count + 1).padStart(4, '0')}`,
+          role: 'staff',
+          name,
+          title,
+          email,
+          phone,
+          staffId,
+          department: deptInfo.dept,
+          faculty: deptInfo.faculty,
+          password: 'password123',
+        });
+        count++;
+      }
+    }
+  }
+
+  return list;
+}
+
+export const MOCK_STAFF = generateStaff();
 
 export const MOCK_ADMINS = [
   {
@@ -377,10 +191,8 @@ export const MOCK_ADMINS = [
     role: 'admin',
     name: 'SUG Executive Admin',
     email: 'sug.admin@futa.edu.ng',
-    phone: '08011112222',
-    staffId: 'FUTA/ADM/SUG/01',
-    department: 'Student Union',
-    faculty: 'Computing',
+    roleType: 'SUG_ADMIN',
+    departmentUnit: 'Student Union',
     password: 'password123',
   },
   {
@@ -388,10 +200,8 @@ export const MOCK_ADMINS = [
     role: 'admin',
     name: 'Faculty of Computing Admin',
     email: 'computing.admin@futa.edu.ng',
-    phone: '08022223333',
-    staffId: 'FUTA/ADM/FAC/01',
-    department: 'Deanery',
-    faculty: 'Computing',
+    roleType: 'FACULTY_ADMIN',
+    departmentUnit: 'Deanery',
     password: 'password123',
   },
   {
@@ -399,10 +209,8 @@ export const MOCK_ADMINS = [
     role: 'admin',
     name: 'Software Eng. Dept Admin',
     email: 'sen.admin@futa.edu.ng',
-    phone: '08033334444',
-    staffId: 'FUTA/ADM/DEP/01',
-    department: 'Software Engineering',
-    faculty: 'Computing',
+    roleType: 'DEPARTMENT_ADMIN',
+    departmentUnit: 'Software Engineering',
     password: 'password123',
   },
   {
@@ -410,32 +218,143 @@ export const MOCK_ADMINS = [
     role: 'admin',
     name: 'University Bursar Admin',
     email: 'bursar.admin@futa.edu.ng',
-    phone: '08044445555',
-    staffId: 'FUTA/ADM/BUR/01',
-    department: 'Bursary',
-    faculty: 'Administration',
+    roleType: 'BURSAR',
+    departmentUnit: 'Bursary',
     password: 'password123',
   },
 ];
 
-/**
- * Authenticate a user from the mock database.
- */
-export function authenticateMockUser(idInput, passwordInput, role) {
-  let dbList = MOCK_STUDENTS;
-  if (role === 'staff') dbList = MOCK_STAFF;
-  if (role === 'admin') dbList = MOCK_ADMINS;
+export const MOCK_DUES = [
+  {
+    id: 'dues-std-001',
+    name: 'Student Union Government (SUG) Dues',
+    amount: 2000,
+    category: 'Student Union',
+    description: 'Annual SUG developmental levy, welfare, and membership fee covering all student activities.',
+    deadline: '2026-08-31',
+    roleTarget: 'student',
+    isActive: true,
+  },
+  {
+    id: 'dues-std-002',
+    name: 'Faculty Developmental Levy',
+    amount: 3500,
+    category: 'Faculty',
+    description: 'Faculty-level operational fees, computing laboratory maintenance, and annual seminar series.',
+    deadline: '2026-09-15',
+    roleTarget: 'student',
+    isActive: true,
+  },
+  {
+    id: 'dues-std-003',
+    name: 'Departmental Dues',
+    amount: 5000,
+    category: 'Departmental',
+    description: 'Software Engineering Department laboratory maintenance and final year project seed fund.',
+    deadline: '2026-06-25',
+    roleTarget: 'student',
+    isActive: true,
+  },
+  {
+    id: 'dues-std-004',
+    name: 'Library Clearance & E-Resource Fee',
+    amount: 1500,
+    category: 'Other',
+    description: 'Central library digital resources access and annual clearance administration.',
+    deadline: '2026-09-30',
+    roleTarget: 'student',
+    isActive: true,
+  },
+  {
+    id: 'dues-std-005',
+    name: 'Sports & Recreation Levy',
+    amount: 1000,
+    category: 'Other',
+    description: 'Annual sports complex access, athletic equipment maintenance, and inter-faculty games.',
+    deadline: '2026-10-15',
+    roleTarget: 'student',
+    isActive: true,
+  },
+  {
+    id: 'dues-std-006',
+    name: 'Medical / Health Insurance Levy',
+    amount: 2500,
+    category: 'Health',
+    description: 'Student Health Centre operational levy, NHIS subsidized medicines, and clinic clearance.',
+    deadline: '2026-07-01',
+    roleTarget: 'student',
+    isActive: true,
+  },
+  {
+    id: 'dues-stf-001',
+    name: 'ASUU Union Monthly Dues',
+    amount: 2000,
+    category: 'Staff Union',
+    description: 'Academic Staff Union of Universities standard membership and welfare levy.',
+    deadline: '2026-08-31',
+    roleTarget: 'staff',
+    isActive: true,
+  },
+  {
+    id: 'dues-stf-002',
+    name: 'Staff Welfare & Cooperative Fund',
+    amount: 5000,
+    category: 'Welfare',
+    description: 'Staff cooperative fund, mutual benefits scheme, and quarterly welfare dividend contribution.',
+    deadline: '2026-09-15',
+    roleTarget: 'staff',
+    isActive: true,
+  },
+  {
+    id: 'dues-stf-003',
+    name: 'Staff Club Annual Membership',
+    amount: 10000,
+    category: 'Club',
+    description: 'Annual membership and facility maintenance fee for the FUTA Senior Staff Club.',
+    deadline: '2026-06-30',
+    roleTarget: 'staff',
+    isActive: true,
+  },
+  {
+    id: 'dues-stf-004',
+    name: 'NASU Non-Academic Staff Levy',
+    amount: 1500,
+    category: 'Staff Union',
+    description: 'Non-Academic Staff Union monthly operational levy and emergency relief fund.',
+    deadline: '2026-10-01',
+    roleTarget: 'staff',
+    isActive: true,
+  },
+];
 
-  const idField = role === 'student' ? 'matricNo' : 'staffId';
+export function authenticateMockUser(credential, password, role) {
+  const cred = credential.trim().toLowerCase();
+  const pass = password;
 
-  // Match by matric/staff ID or email
-  const user = dbList.find(
-    (u) =>
-      (u[idField]?.toLowerCase() === idInput?.toLowerCase() ||
-        u.email?.toLowerCase() === idInput?.toLowerCase()) &&
-      u.password === passwordInput
-  );
+  let pool = [];
+  if (role === 'student') pool = MOCK_STUDENTS;
+  else if (role === 'staff') pool = MOCK_STAFF;
+  else if (role === 'admin') pool = MOCK_ADMINS;
 
-  return user || null;
+  const found = pool.find((u) => {
+    const matchEmail = u.email && u.email.toLowerCase() === cred;
+    const matchMatric = u.matricNo && u.matricNo.toLowerCase() === cred;
+    const matchStaffId = u.staffId && u.staffId.toLowerCase() === cred;
+    return matchEmail || matchMatric || matchStaffId;
+  });
+
+  if (!found) {
+    return { success: false, error: `No ${role} account found matching "${credential}"` };
+  }
+
+  if (found.password !== pass && pass !== 'password123') {
+    return { success: false, error: 'Incorrect password. (Default prototype password: password123)' };
+  }
+
+  const { password: _, ...safeUser } = found;
+  return {
+    success: true,
+    token: `mock-jwt-${safeUser.id}-${Date.now()}`,
+    user: safeUser,
+  };
 }
-
