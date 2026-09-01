@@ -319,16 +319,22 @@ export default function AdminPortal({ initialTab = 'overview' }) {
     document.body.removeChild(link);
   };
 
-  // Filtered Registry
+  // Filtered Registry (Completely null-safe)
   const filteredProfiles = profiles.filter((p) => {
+    if (!p) return false;
+    const term = (searchTerm || '').toLowerCase().trim();
     const matchRole = roleFilter === 'all' || p.role === roleFilter;
-    const matchSearch =
-      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.matricNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.staffId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.department?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchRole && matchSearch;
+
+    if (!term) return matchRole;
+
+    const nameMatch = (p.name || '').toLowerCase().includes(term);
+    const emailMatch = (p.email || '').toLowerCase().includes(term);
+    const matricMatch = (p.matricNo || '').toLowerCase().includes(term);
+    const staffIdMatch = (p.staffId || '').toLowerCase().includes(term);
+    const deptMatch = (p.department || '').toLowerCase().includes(term);
+    const facultyMatch = (p.faculty || '').toLowerCase().includes(term);
+
+    return matchRole && (nameMatch || emailMatch || matricMatch || staffIdMatch || deptMatch || facultyMatch);
   });
 
   const totalRegistryPages = Math.ceil(filteredProfiles.length / registryPageSize) || 1;
@@ -337,14 +343,18 @@ export default function AdminPortal({ initialTab = 'overview' }) {
     registryPage * registryPageSize
   );
 
-  // Filtered Receipts
+  // Filtered Receipts (Completely null-safe)
   const filteredReceipts = allReceipts.filter((r) => {
-    const term = ledgerSearch.toLowerCase();
+    if (!r) return false;
+    const term = (ledgerSearch || '').toLowerCase().trim();
+    if (!term) return true;
+
     return (
-      r.txRef?.toLowerCase().includes(term) ||
-      r.payerName?.toLowerCase().includes(term) ||
-      r.payerId?.toLowerCase().includes(term) ||
-      r.duesName?.toLowerCase().includes(term)
+      (r.txRef || '').toLowerCase().includes(term) ||
+      (r.payerName || '').toLowerCase().includes(term) ||
+      (r.payerId || '').toLowerCase().includes(term) ||
+      (r.duesName || '').toLowerCase().includes(term) ||
+      (r.category || '').toLowerCase().includes(term)
     );
   });
 
