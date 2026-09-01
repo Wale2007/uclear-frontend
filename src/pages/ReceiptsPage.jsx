@@ -10,35 +10,40 @@ import {
 import { useDues } from '../context/DuesContext';
 
 export default function ReceiptsPage() {
-  const { receipts, viewReceipt } = useDues();
+  const { receipts = [], viewReceipt } = useDues();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
 
+  const safeReceipts = Array.isArray(receipts) ? receipts : [];
+
   const categories = useMemo(() => {
     const set = new Set(['All']);
-    receipts.forEach((r) => {
-      if (r.category) set.add(r.category);
+    safeReceipts.forEach((r) => {
+      if (r?.category) set.add(r.category);
     });
     return Array.from(set);
-  }, [receipts]);
+  }, [safeReceipts]);
 
   const filteredReceipts = useMemo(() => {
-    return receipts.filter((r) => {
+    const term = (search || '').toLowerCase().trim();
+    return safeReceipts.filter((r) => {
+      if (!r) return false;
       const matchCategory =
         categoryFilter === 'All' || r.category === categoryFilter;
+
       const matchSearch =
-        (r.duesName && r.duesName.toLowerCase().includes(search.toLowerCase())) ||
-        (r.tx_ref && r.tx_ref.toLowerCase().includes(search.toLowerCase())) ||
-        (r.paymentMethod &&
-          r.paymentMethod.toLowerCase().includes(search.toLowerCase()));
+        !term ||
+        (r.duesName && r.duesName.toLowerCase().includes(term)) ||
+        (r.tx_ref && r.tx_ref.toLowerCase().includes(term)) ||
+        (r.paymentMethod && r.paymentMethod.toLowerCase().includes(term));
 
       return matchCategory && matchSearch;
     });
-  }, [receipts, search, categoryFilter]);
+  }, [safeReceipts, search, categoryFilter]);
 
   const totalSettled = useMemo(() => {
-    return receipts.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
-  }, [receipts]);
+    return safeReceipts.reduce((acc, r) => acc + (Number(r?.amount) || 0), 0);
+  }, [safeReceipts]);
 
   return (
     <div className="space-y-6 max-w-5xl animate-fade-in">

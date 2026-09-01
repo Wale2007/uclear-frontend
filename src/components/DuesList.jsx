@@ -79,14 +79,18 @@ function DueCard({ due, isPaid, receipt, onPay, onViewReceipt }) {
   );
 }
 
-export default function DuesList({ dues, receipts, onInitiatePayment, onViewReceipt }) {
+export default function DuesList({ dues = [], receipts = [], onInitiatePayment, onViewReceipt }) {
   const [search, setSearch]     = useState('');
   const [status, setStatus]     = useState('All');
   const [category, setCategory] = useState('All');
 
+  const safeDues = Array.isArray(dues) ? dues : [];
+  const safeReceipts = Array.isArray(receipts) ? receipts : [];
+
   const filtered = useMemo(() => {
-    return dues.filter(due => {
-      const isPaid    = receipts.some(r => r.duesName === due.name);
+    return safeDues.filter(due => {
+      if (!due) return false;
+      const isPaid = safeReceipts.some(r => r?.duesName && due?.name && r.duesName.trim().toLowerCase() === due.name.trim().toLowerCase());
       const isOverdue = checkIsOverdue(due, isPaid);
 
       const matchStatus =
@@ -96,15 +100,17 @@ export default function DuesList({ dues, receipts, onInitiatePayment, onViewRece
         (status === 'Pending' && !isPaid && !isOverdue);
 
       const matchCategory = category === 'All' || due.category === category;
-      const matchSearch   = due.name.toLowerCase().includes(search.toLowerCase()) ||
-                            due.category.toLowerCase().includes(search.toLowerCase());
+      const term = (search || '').toLowerCase().trim();
+      const matchSearch   = !term ||
+                            (due.name || '').toLowerCase().includes(term) ||
+                            (due.category || '').toLowerCase().includes(term);
 
       return matchStatus && matchCategory && matchSearch;
     });
-  }, [dues, receipts, search, status, category]);
+  }, [safeDues, safeReceipts, search, status, category]);
 
-  const paidCount    = dues.filter(d => receipts.some(r => r.duesName === d.name)).length;
-  const pendingCount = dues.length - paidCount;
+  const paidCount    = safeDues.filter(d => safeReceipts.some(r => r?.duesName && d?.name && r.duesName.trim().toLowerCase() === d.name.trim().toLowerCase())).length;
+  const pendingCount = safeDues.length - paidCount;
 
   return (
     <div className="space-y-6 animate-fade-in">

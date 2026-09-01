@@ -128,7 +128,7 @@ export default function Dashboard({ user = {}, dues = [], receipts = [], onViewR
         <StatCard
           label="Total Cleared"
           value={`\u20A6${totalPaid.toLocaleString()}`}
-          sub={`${paidDues.length} of ${dues.length} levies settled`}
+          sub={`${paidDues.length} of ${duesList.length} levies settled`}
           icon={TrendingUp}
           accentColor="#059669"
         />
